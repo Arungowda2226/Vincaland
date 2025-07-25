@@ -6,32 +6,41 @@ import {
   Image,
   TextInput,
   Pressable,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import Checkbox from "expo-checkbox";
 
 const { width, height } = Dimensions.get("window");
 
-const AppLogin = ({navigation}) => {
-  const [mail, setMail] = useState("");
-  const [password, setPassword] = useState("");
+const AppSignUp = ({navigation}) => {
   const [isChecked, setChecked] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const iconSource = showPass
     ? require('../../../assets/hideEye.png')
     : require('../../../assets/eye.png');
 
+const iconConfirm = showConfirmPass
+    ? require('../../../assets/hideEye.png')
+    : require('../../../assets/eye.png');
+
   const handleShowPass = () => {
-    setShowPass(!showPass)
+    setShowPass(!showPass);
   }
-  
-  const handleLogin = () => {
-    navigation.navigate("Home");
+
+  const handleShowConfirmPass = () => {
+    setShowConfirmPass(!showConfirmPass)
   }
 
   const handleSignUp = () => {
-    navigation.navigate("AppSignUp");
+    navigation.navigate("appLogin")
   }
 
   return (
@@ -41,24 +50,48 @@ const AppLogin = ({navigation}) => {
           source={require("../../../assets/Vector.png")}
           style={styles.iconImage}
         />
-        <Text style={styles.topLabel}>Hi, Welcome back!</Text>
-        <Text style={styles.profileLabel}>Let's get started.</Text>
+        <Text style={styles.topLabel}>Create an acount</Text>
+        <Text style={styles.profileLabel}>Set Up Your Profile</Text>
       </View>
-      <View style={{marginTop:20}}>
-        <Text style={styles.signInLabel}>Login</Text>
+      <ScrollView contentContainerStyle={{marginTop:20, paddingBottom:200}}>
+        <Text style={styles.signInLabel}>Sign in</Text>
         <Text style={styles.infoLoginLabel}>
-          Please fill in your details for Login
+          Please fill in your details for sign in
         </Text>
         <View style={[styles.container, { marginTop: 10 }]}>
+          <Image
+            source={require("../../../assets/user.png")}
+            style={styles.lockIcon}
+          />
+          <TextInput
+            placeholder="Enter full name"
+            onChangeText={setFullName}
+            value={fullName}
+            style={{flex:1 }}
+          />
+        </View>
+        <View style={styles.container}>
           <Image
             source={require("../../../assets/email.png")}
             style={styles.lockIcon}
           />
           <TextInput
-            placeholder="Enter your  email"
-            onChangeText={setMail}
-            value={mail}
-            style={{flex:1}}
+            placeholder="Enter your email"
+            onChangeText={setEmail}
+            value={email}
+            style={{flex:1 }}
+          />
+        </View>
+        <View style={styles.container}>
+          <Image
+            source={require("../../../assets/phone.png")}
+            style={styles.lockIcon}
+          />
+          <TextInput
+            placeholder="Phone number"
+            onChangeText={setPhone}
+            value={phone}
+            style={{flex:1 }}
           />
         </View>
         <View style={[styles.container, { justifyContent: "space-between" }]}>
@@ -79,6 +112,24 @@ const AppLogin = ({navigation}) => {
             <Image source={iconSource} style={styles.lockIcon} />          
           </Pressable>
         </View>
+        <View style={[styles.container, { justifyContent: "space-between" }]}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              source={require("../../../assets/lock.png")}
+              style={styles.lockIcon}
+            />
+            <TextInput
+              placeholder="Re-Enter your  password"
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+              secureTextEntry={showConfirmPass? false: true}
+              style={{width:"75%"}}
+            />
+          </View>
+          <Pressable onPress={handleShowConfirmPass}>
+            <Image source={iconConfirm} style={styles.lockIcon} />          
+          </Pressable>
+        </View>
         <View style={styles.mainBox}>
           <View style={styles.checkBox}>
             <Checkbox
@@ -86,27 +137,24 @@ const AppLogin = ({navigation}) => {
               onValueChange={setChecked}
               color={isChecked ? "#4630EB" : undefined}
             />
-            <Text style={styles.paragraph}>Remember me</Text>
+            <Text style={styles.paragraph}>I Agree to <Text style={{color:"#4630EB"}}>Terms</Text> and <Text style={{color:"#4630EB"}}>Conditions</Text></Text>
           </View>
-          <Pressable>
-            <Text style={styles.forgotPassLabel}>Forgot password?</Text>
-          </Pressable>
         </View>
-        <Pressable onPress={handleLogin} style={styles.loginBtn}>
-          <Text style={styles.loginLabel}>Login</Text>
+        <Pressable style={styles.loginBtn}>
+          <Text style={styles.loginLabel}>Create account</Text>
         </Pressable>
         <View style={styles.doHaveBox}>
-          <Text style={styles.singUpLabel}>Don't have an account?</Text>
+          <Text style={styles.singUpLabel}>Already have an account?</Text>
           <Pressable onPress={handleSignUp}>
-            <Text style={[styles.singUpLabel, { color: "#4630EB", marginLeft:10 }]}>Sign Up</Text>
+            <Text style={[styles.singUpLabel, { color: "#4630EB", marginLeft:10 }]}>Sign in</Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
 
-export default AppLogin;
+export default AppSignUp
 
 const styles = StyleSheet.create({
   main: {

@@ -1,30 +1,58 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { Ionicons } from '@expo/vector-icons'
+import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const Header = () => {
-  return (
-    <View style={styles.main}>
-        <Ionicons name='chevron-back-outline' size={30}/>
-        <Text style={styles.headerLabel}>Header</Text>
-        <View style={{width:"10%"}}/>
-    </View>
-  )
+
+
+const Header = ({ title, navigation }) => {
+
+    const handleBack = () => {
+        navigation.goBack();
+    }
+
+    return (
+        <View style={styles.container}>
+            <Ionicons name="chevron-back-outline" size={30} onPress={handleBack}/>
+            {
+                title ?
+                    <Text style={styles.headerTitle}>{title}</Text>
+                    :
+                    <View style={styles.locationContainer}>
+                        <Ionicons name="location-outline" size={20} />
+                        <Text style={styles.locationLabel}>Bengaluru</Text>
+                    </View>
+            }
+        </View>
+    );
 }
 
-export default Header
-
 const styles = StyleSheet.create({
-    main:{
-        marginVertical:10,
-        padding:20,
-        flexDirection:"row",
-        alignItems:"center",
-        justifyContent:"space-between",
-        // backgroundColor:"pink"
+    container: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingTop: 30,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        backgroundColor:"#ffff"
     },
-    headerLabel:{
-      fontWeight:"600",
-      fontSize: 18
+    locationContainer: {
+        padding: 10,
+        backgroundColor: "#cccc",
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius: 13,
+        marginLeft: 20
+    },
+    locationLabel: {
+        fontWeight: "bold",
+        fontSize: 16,
+        marginLeft: 8
+    },
+    headerTitle:{
+        fontWeight:"600",
+        fontSize:18,
+        marginLeft:15
     }
 })
+
+export default Header;
