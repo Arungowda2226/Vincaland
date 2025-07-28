@@ -9,6 +9,7 @@ import AppLogin from "./src/component/applogin/AppLogin";
 import AppSignUp from "./src/component/appsingup/AppSignUp";
 import Home from "./src/component/home/Home";
 import Loan from "./src/component/loan/Loan";
+import Investment from "./src/component/investment/Investment";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="DashBoard" component={DashBoard} />
         <Stack.Screen name="Loan" component={Loan} />
+        <Stack.Screen name="Investment" component={Investment} />
       </Stack.Navigator>
     </NavigationContainer>
   );

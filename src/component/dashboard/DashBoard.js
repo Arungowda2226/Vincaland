@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,11 +12,12 @@ import Header from "../header/Header";
 import { Ionicons } from "@expo/vector-icons";
 import themeColor from "../colorpicker/ThemeColor";
 import { BarChart } from "react-native-gifted-charts";
+import { LinearGradient } from "expo-linear-gradient";
 // import { Table, Row, Rows } from "react-native-table-component";
 
 const { width, height } = Dimensions.get("window");
 
-const DashBoard = () => {
+const DashBoard = ({ navigation }) => {
   const tableHead = ["Head", "Head2", "Head3", "Head4"];
   const tableData = [
     ["1", "2", "3", "4"],
@@ -55,13 +57,22 @@ const DashBoard = () => {
 
   return (
     <View style={styles.main}>
-      <Header />
+      <Header
+        title={"Premium Member Dashboard"}
+        navigation={navigation}
+        userIcon={true}
+      />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.infoContainer}>
+        {/* <View style={styles.infoContainer}>
           <Text style={styles.infoText}>Premium Member's DashBoard</Text>
           <Ionicons name="person-circle" size={30} color="#5D17EB" />
-        </View>
-        <View style={styles.firstContainer}>
+        </View> */}
+        <LinearGradient
+          colors={["#0516D3", "#D21084"]}
+          start={{ x: 0, y: 0 }} // Left
+          end={{ x: 1, y: 0 }}
+          style={styles.firstContainer}
+        >
           <View>
             <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
             <Text style={styles.withdrawBtnLabel}>₹0</Text>
@@ -70,9 +81,10 @@ const DashBoard = () => {
             </Text>
           </View>
           <Pressable style={styles.withdrawBtn}>
-            <Text style={styles.withdrawBtnLabel}>₹ withdraw</Text>
+            <Ionicons name="wallet-outline" size={20} color={"white"}/>
+            <Text style={styles.withdrawBtnLabel}>withdraw</Text>
           </Pressable>
-        </View>
+        </LinearGradient>
         <View style={styles.secMainContainer}>
           <View style={styles.secContainer}>
             <View style={styles.firstBox}>
@@ -110,6 +122,7 @@ const DashBoard = () => {
               <Text>Your Money growth and returns over time</Text>
             </View>
             <Pressable style={styles.nanReturnBtn}>
+              <Image source={require('../../../assets/Arrow.png')}/>
               <Text style={styles.nanReturnLabel}>+NaN% Returns</Text>
             </Pressable>
           </View>
@@ -187,54 +200,77 @@ const DashBoard = () => {
                 isAnimated
                 showLegend={true}
               />
-              <View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", marginVertical:10}}>
-              <View style={{flexDirection:"row", alignItems:"center"}}>
-                <View style={{height:20, width:20, borderRadius:5,backgroundColor:"#6A0DAD",marginLeft:3}}/>
-                <Text>Invested</Text>
-              </View>
-              <View style={{flexDirection:"row", alignItems:"center", marginLeft:10}}>
-                <View style={{height:20, width:20, borderRadius:5,backgroundColor:"green",marginLeft:3}}/>
-                <Text>Returns</Text>
-              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginVertical: 10,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View
+                    style={{
+                      height: 20,
+                      width: 20,
+                      borderRadius: 5,
+                      backgroundColor: "#6A0DAD",
+                      marginLeft: 3,
+                    }}
+                  />
+                  <Text>Invested</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginLeft: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 20,
+                      width: 20,
+                      borderRadius: 5,
+                      backgroundColor: "green",
+                      marginLeft: 3,
+                    }}
+                  />
+                  <Text>Returns</Text>
+                </View>
               </View>
             </View>
           )}
           <View
-                style={{
-                  marginVertical: 10,
-                  borderWidth: 1,
-                  borderColor: themeColor.BORDER_CLR,
-                }}
-              />
-              <View style={styles.extraDetails}>
-                <View style={styles.subExtraDetails}>
-                  <Text style={styles.tableLabel}>Montly Membership Fee</Text>
-                  <Text style={styles.tableLabel}>₹1200</Text>
-                </View>
-                <View style={styles.subExtraDetails}>
-                  <Text style={styles.tableLabel}>Current Monthly Refunds</Text>
-                  <Text style={styles.tableLabel}>₹3000</Text>
-                </View>
-                <View style={styles.subExtraDetails}>
-                  <Text style={styles.tableLabel}>Net Value</Text>
-                  <Text style={styles.tableLabel}>₹4800</Text>
-                </View>
-              </View>
+            style={{
+              marginVertical: 10,
+              borderWidth: 1,
+              borderColor: themeColor.BORDER_CLR,
+            }}
+          />
+          <View style={styles.extraDetails}>
+            <View style={styles.subExtraDetails}>
+              <Text style={styles.tableLabel}>Montly Membership Fee</Text>
+              <Text style={styles.tableLabel}>₹1200</Text>
+            </View>
+            <View style={styles.subExtraDetails}>
+              <Text style={styles.tableLabel}>Current Monthly Refunds</Text>
+              <Text style={styles.tableLabel}>₹3000</Text>
+            </View>
+            <View style={styles.subExtraDetails}>
+              <Text style={styles.tableLabel}>Net Value</Text>
+              <Text style={styles.tableLabel}>₹4800</Text>
+            </View>
+          </View>
         </View>
 
-        <View
-          style={{
-            paddingLeft: 10,
-            backgroundColor: themeColor.BLUE_CLR,
-            borderRadius: 13,
-            marginVertical: 10,
-          }}
-        >
+       
           <View
             style={{
               padding: 10,
-              backgroundColor: themeColor.LIGHT_BLUE_CLR,
+              backgroundColor: "#FFFFFF",
               borderRadius: 13,
+              marginVertical:10
             }}
           >
             <View
@@ -261,7 +297,7 @@ const DashBoard = () => {
               <Pressable
                 style={{
                   padding: 10,
-                  backgroundColor: "green",
+                  backgroundColor: "#3DC426",
                   flexDirection: "row",
                   alignItems: "center",
                   borderRadius: 13,
@@ -280,23 +316,23 @@ const DashBoard = () => {
               }}
             >
               <View>
-                <Text>Due Date</Text>
-                <Text>5th Augest</Text>
+                <Text style={styles.nextPayLabel}>Due Date</Text>
+                <Text style={styles.subLabel}>5th Augest</Text>
               </View>
               <View>
-                <Text>Amount Due</Text>
-                <Text>1200</Text>
+                <Text style={styles.nextPayLabel}>Amount Due</Text>
+                <Text style={styles.subLabel}>1200</Text>
               </View>
               <View>
-                <Text>Expected Return</Text>
-                <Text>3000</Text>
+                <Text style={styles.nextPayLabel}>Expected Return</Text>
+                <Text style={styles.subLabel}>3000</Text>
               </View>
             </View>
             <View
               style={{
                 padding: 10,
                 borderWidth: 1,
-                backgroundColor: "white",
+                backgroundColor: "#dbe3e7ff",
                 marginVertical: 10,
                 borderColor: themeColor.BORDER_CLR,
                 borderRadius: 13,
@@ -314,7 +350,7 @@ const DashBoard = () => {
               <Pressable
                 style={{
                   padding: 10,
-                  backgroundColor: "#DCEDC8",
+                  backgroundColor: "#aaca85ff",
                   borderRadius: 13,
                 }}
               >
@@ -322,7 +358,6 @@ const DashBoard = () => {
               </Pressable>
             </View>
           </View>
-        </View>
       </ScrollView>
     </View>
   );
@@ -361,25 +396,28 @@ const styles = StyleSheet.create({
   },
   withdrawBtn: {
     padding: 10,
-    backgroundColor: "green",
+    backgroundColor: "#3DC426",
     borderRadius: 13,
+    flexDirection:"row",
+    alignItems:"center",
   },
   withdrawBtnLabel: {
     fontWeight: "600",
     fontSize: 15,
     color: "white",
+    marginLeft:5
   },
   secContainer: {
     paddingHorizontal: 15,
     borderRadius: 13,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: "#FFFFFF",
     paddingVertical: 20,
     width: width * 0.42,
   },
   secSubContainer: {
     paddingHorizontal: 15,
     borderRadius: 13,
-    backgroundColor: "#5D17EB",
+    backgroundColor: "#3DC426",
     paddingVertical: 20,
     width: width * 0.42,
   },
@@ -435,15 +473,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0F2FE",
     padding: 10,
     borderRadius: 13,
+    flexDirection:"row",
+    alignItems:"center"
   },
   nanReturnLabel: {
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 14,
     color: "#5D17EB",
   },
   viewContainer: {
     padding: 3,
-    backgroundColor: themeColor.BORDER_CLR,
+    backgroundColor: "#E7E7E7",
     borderRadius: 13,
     marginVertical: 10,
     flexDirection: "row",
@@ -491,4 +531,11 @@ const styles = StyleSheet.create({
   subExtraDetails: {
     width: width * 0.25,
   },
+  subLabel:{
+    fontWeight:"700",
+    fontSize:14
+  },
+  nextPayLabel:{
+
+  }
 });

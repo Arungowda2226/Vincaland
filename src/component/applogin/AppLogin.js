@@ -6,33 +6,74 @@ import {
   Image,
   TextInput,
   Pressable,
+  Modal,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Checkbox from "expo-checkbox";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const AppLogin = ({navigation}) => {
+const AppLogin = ({ navigation }) => {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [isShowForgotPass, setIsShowForgotPass] = useState(false);
+  const [isShowOtp, setIsShowOtp] = useState(false);
+  const [isShowNewPasswordModal, setIsShowNewPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const otpRefs = useRef([]);
 
   const iconSource = showPass
-    ? require('../../../assets/hideEye.png')
-    : require('../../../assets/eye.png');
+    ? require("../../../assets/hideEye.png")
+    : require("../../../assets/eye.png");
 
   const handleShowPass = () => {
-    setShowPass(!showPass)
-  }
-  
+    setShowPass(!showPass);
+  };
+
   const handleLogin = () => {
     navigation.navigate("Home");
-  }
+  };
 
   const handleSignUp = () => {
     navigation.navigate("AppSignUp");
-  }
+  };
+
+  const handleForgotPass = () => {
+    setIsShowForgotPass(true);
+  };
+
+  const handleSubmitPhone = () => {
+    setIsShowForgotPass(false);
+    setIsShowOtp(true);
+  };
+
+  const handleOtpChange = (value, index) => {
+    if (!/^\d?$/.test(value)) return;
+
+    const updated = [...otpDigits];
+    updated[index] = value;
+    setOtpDigits(updated);
+
+    if (value && index < otpRefs.current.length - 1) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === "Backspace" && !otpDigits[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleSubmitOtp = () => {
+    setIsShowOtp(false);
+    setIsShowNewPasswordModal(true);
+  };
 
   return (
     <View style={styles.main}>
@@ -44,7 +85,7 @@ const AppLogin = ({navigation}) => {
         <Text style={styles.topLabel}>Hi, Welcome back!</Text>
         <Text style={styles.profileLabel}>Let's get started.</Text>
       </View>
-      <View style={{marginTop:20}}>
+      <View style={{ marginTop: 20 }}>
         <Text style={styles.signInLabel}>Login</Text>
         <Text style={styles.infoLoginLabel}>
           Please fill in your details for Login
@@ -58,7 +99,7 @@ const AppLogin = ({navigation}) => {
             placeholder="Enter your  email"
             onChangeText={setMail}
             value={mail}
-            style={{flex:1}}
+            style={{ flex: 1 }}
           />
         </View>
         <View style={[styles.container, { justifyContent: "space-between" }]}>
@@ -71,12 +112,12 @@ const AppLogin = ({navigation}) => {
               placeholder="Enter your  password"
               onChangeText={setPassword}
               value={password}
-              secureTextEntry={showPass? false: true}
-              style={{width:"75%"}}
+              secureTextEntry={showPass ? false : true}
+              style={{ width: "75%" }}
             />
           </View>
           <Pressable onPress={handleShowPass}>
-            <Image source={iconSource} style={styles.lockIcon} />          
+            <Image source={iconSource} style={styles.lockIcon} />
           </Pressable>
         </View>
         <View style={styles.mainBox}>
@@ -88,7 +129,7 @@ const AppLogin = ({navigation}) => {
             />
             <Text style={styles.paragraph}>Remember me</Text>
           </View>
-          <Pressable>
+          <Pressable onPress={handleForgotPass}>
             <Text style={styles.forgotPassLabel}>Forgot password?</Text>
           </Pressable>
         </View>
@@ -98,10 +139,165 @@ const AppLogin = ({navigation}) => {
         <View style={styles.doHaveBox}>
           <Text style={styles.singUpLabel}>Don't have an account?</Text>
           <Pressable onPress={handleSignUp}>
-            <Text style={[styles.singUpLabel, { color: "#4630EB", marginLeft:10 }]}>Sign Up</Text>
+            <Text
+              style={[styles.singUpLabel, { color: "#4630EB", marginLeft: 10 }]}
+            >
+              Sign Up
+            </Text>
           </Pressable>
         </View>
       </View>
+      <Modal
+        visible={isShowForgotPass}
+        transparent
+        animationType="slide" // This makes it slide from bottom
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setIsShowForgotPass(false)}
+        >
+          <Pressable style={styles.bottomModal} onPress={() => {}}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={styles.modalTitle}>Reset Password</Text>
+              <Ionicons
+                onPress={() => setIsShowForgotPass(false)}
+                name="close-circle-outline"
+                size={30}
+              />
+            </View>
+
+            <Text style={styles.modalText}>
+              Enter your email to reset your password
+            </Text>
+            <View style={styles.modalInput}>
+              <Image source={require("../../../assets/user.png")} />
+              <TextInput placeholder="Enter your phone number" />
+            </View>
+
+            <Pressable onPress={handleSubmitPhone} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Submit</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      <Modal
+        visible={isShowOtp}
+        transparent
+        animationType="slide" // This makes it slide from bottom
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setIsShowOtp(false)}
+        >
+          <Pressable style={styles.bottomModal} onPress={() => {}}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={styles.modalTitle}>Reset Password</Text>
+              <Ionicons
+                onPress={() => setIsShowOtp(false)}
+                name="close-circle-outline"
+                size={30}
+              />
+            </View>
+
+            <Text style={styles.modalText}>Enter OTP Code</Text>
+            <View style={styles.otpContainer}>
+              {otpDigits.map((digit, index) => (
+                <View style={styles.box} key={index}>
+                  <TextInput
+                    ref={(el) => (otpRefs.current[index] = el)}
+                    style={styles.otpInput}
+                    maxLength={1}
+                    keyboardType="numeric"
+                    onChangeText={(val) => handleOtpChange(val, index)}
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    value={digit}
+                    autoFocus={index === 0}
+                  />
+                </View>
+              ))}
+            </View>
+
+            <Pressable onPress={handleSubmitOtp} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Submit</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      <Modal visible={isShowNewPasswordModal} transparent animationType="slide">
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setIsShowNewPasswordModal(false)}
+        >
+          <Pressable style={styles.bottomModal} onPress={() => {}}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={styles.modalTitle}>Create New Password</Text>
+              <Ionicons
+                onPress={() => setIsShowNewPasswordModal(false)}
+                name="close-circle-outline"
+                size={30}
+              />
+            </View>
+
+            <Text style={styles.modalText}>Enter your new password</Text>
+
+            <View style={styles.modalInput}>
+              <Ionicons name="lock-closed-outline" size={20} color="#555" />
+              <TextInput
+                placeholder="New Password"
+                secureTextEntry
+                style={{ flex: 1, marginLeft: 10 }}
+                onChangeText={setNewPassword}
+                value={newPassword}
+              />
+            </View>
+
+            <View style={styles.modalInput}>
+              <Ionicons name="lock-closed-outline" size={20} color="#555" />
+              <TextInput
+                placeholder="Re-enter Password"
+                secureTextEntry
+                style={{ flex: 1, marginLeft: 10 }}
+                onChangeText={setConfirmPassword}
+                value={confirmPassword}
+              />
+            </View>
+
+            <Pressable
+              onPress={() => {
+                // Add validation and API call logic here
+                if (newPassword && newPassword === confirmPassword) {
+                  setIsShowNewPasswordModal(false);
+                  alert("Password successfully reset!");
+                  // Optionally navigate to login or home
+                } else {
+                  alert("Passwords do not match");
+                }
+              }}
+              style={styles.modalButton}
+            >
+              <Text style={styles.modalButtonText}>Submit</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -138,7 +334,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 13,
     color: "#0516D3",
-    marginTop:7
+    marginTop: 7,
   },
   container: {
     padding: 10,
@@ -179,21 +375,88 @@ const styles = StyleSheet.create({
     backgroundColor: "#0516D3",
     marginVertical: 10,
     marginTop: 20,
-    borderRadius: 13
+    borderRadius: 13,
   },
   loginLabel: {
     fontWeight: "600",
     fontSize: 17,
-    color: "#FFFFFF"
+    color: "#FFFFFF",
   },
   doHaveBox: {
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    marginVertical: 10
+    marginVertical: 10,
   },
   singUpLabel: {
     fontWeight: "500",
     fontSize: 14,
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+
+  bottomModal: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    elevation: 5,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+
+  modalText: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 15,
+  },
+
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  modalButton: {
+    backgroundColor: "#0516D3",
+    paddingVertical: 12,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+
+  modalButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  otpContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
+  box: {
+    borderRadius: 13,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    padding: 2,
+    marginRight: 3,
+    marginVertical: 10,
+  },
+  otpInput: {
+    width: width * 0.1,
+    height: width * 0.12,
+    textAlign: "center",
+    fontSize: 18,
+  },
 });

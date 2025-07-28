@@ -20,6 +20,10 @@ const Home = ({navigation}) => {
         navigation.navigate('Login');
     }
 
+    const handleInvestment = () => {
+        navigation.navigate('Investment');
+    }
+
     return (
         <View style={styles.main}>
             <View style={styles.header}>
@@ -60,13 +64,13 @@ const Home = ({navigation}) => {
                             <Text style={styles.dashBoardLabel}>Dashboard</Text>
                         </Pressable>
                     </View>
-                    <View style={styles.investmentContainer}>
+                    <Pressable onPress={handleInvestment} style={styles.investmentContainer}>
                         <Image
                             source={require('../../../assets/investment.png')}
                             style={styles.investmentImage}
                         />
                         <Text style={styles.investMentLabel}>Investment</Text>
-                    </View>
+                    </Pressable>
                 </View>
 
                 <LinearGradient colors={['#DAFFE6', '#C2C4FF']} style={styles.subScribcontainer}>
