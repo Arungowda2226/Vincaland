@@ -4,7 +4,7 @@
     "slug": "vincaland",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Vector.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "jsEngine": "hermes",
@@ -31,6 +31,12 @@
       "eas": {
         "projectId": "561dc0df-893b-4141-a429-7b9857104a34"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/561dc0df-893b-4141-a429-7b9857104a34"
     }
   }
 }

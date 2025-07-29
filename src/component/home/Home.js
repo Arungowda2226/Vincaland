@@ -143,14 +143,14 @@ export default Home
 const styles = StyleSheet.create({
     main: {
         flex: 1,
-        padding: 24
     },
     header: {
         marginTop: 20,
         marginBottom: 10,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        padding: 24
     },
     iconImage: {
         height: height * 0.03,
@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         paddingVertical: 10,
+        padding: 24
         // paddingBottom: "200"
     },
     loanContainer: {
