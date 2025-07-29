@@ -1,7 +1,18 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import LoginScreen from "./LoginScreen";
 import Register from "./Register";
+import { Image } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+
+const { width, height } = Dimensions.get("window");
 
 export default function Login() {
   const [showLogin, setShowLogin] = useState(true);
@@ -19,7 +30,26 @@ export default function Login() {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 24, paddingBottom: 100 }}>
+      <View style={{ flex: 1, padding: 24, paddingBottom: 100, marginTop: 20 }}>
+        <Image
+          source={require("../../../assets/Vector.png")}
+          style={{
+            width: width * 0.12,
+            height: height * 0.06,
+            resizeMode: "stretch",
+          }}
+        />
+
+        <Image
+          source={require("../../../assets/Arrow.png")}
+          style={{
+            alignSelf: "center",
+            width: width * 0.15,
+            height: height * 0.05,
+            resizeMode: "stretch",
+            marginVertical: 10,
+          }}
+        />
         <Text style={styles.mainLabel}>Premium Members Dashboard</Text>
         <Text style={styles.welLabel}>
           {showLogin ? "Welcome back" : "Join us today"}
@@ -63,7 +93,7 @@ export default function Login() {
         </View>
 
         {/* Extra Login Options */}
-        {showLogin && (
+        {/* {showLogin && (
           <View style={styles.loginType}>
             <Pressable style={styles.typeBtn}>
               <Text style={styles.withOtp}>Login with OTP</Text>
@@ -75,16 +105,22 @@ export default function Login() {
               </Text>
             </Pressable>
           </View>
-        )}
-        {showReg && (
-            <View style={styles.loginType}>
-              <Text style={styles.dontAc}>
-                Already have an Account?
-                <Text style={styles.withOtp}>Sign in</Text>
-              </Text>
-            </View>
-        )}
+        )} */}
+        {/* {showReg && (
+          <View style={styles.loginType}>
+            <Text style={styles.dontAc}>
+              Already have an Account?
+              <Text style={styles.withOtp}>Sign in</Text>
+            </Text>
+          </View>
+        )} */}
       </View>
+      <LinearGradient
+            colors={["#0012DD", "#0514BC"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientBox}
+          />
     </ScrollView>
   );
 }
@@ -105,12 +141,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   container: {
-    borderWidth: 1.5,
-    borderColor: "blue",
     padding: 20,
-    borderRadius: 13,
-    marginTop: 30,
-    paddingBottom: 20,
+    borderRadius: 15,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    shadowOpacity: 0.14,
+    shadowRadius: 4.2,
+    elevation: 5, // required for Android shadow
+     paddingBottom: 20,
   },
   buttons: {
     flexDirection: "row",
@@ -149,5 +191,9 @@ const styles = StyleSheet.create({
   },
   typeBtn: {
     marginVertical: 10,
+  },
+   gradientBox: {
+    borderRadius: 15,
+    transform: [{ rotate: '39.61deg' }],
   },
 });

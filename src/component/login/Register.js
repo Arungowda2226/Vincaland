@@ -23,7 +23,7 @@ const Register = () => {
 
   const handleAddPhone = () => {
     setShowAddPhoneModal(true);
-  }
+  };
 
   const handleOtpChange = (value, index) => {
     if (!/^\d?$/.test(value)) return;
@@ -100,6 +100,12 @@ const Register = () => {
       <Pressable style={styles.createBtn}>
         <Text style={styles.createBtnLabel}>Create Account</Text>
       </Pressable>
+      <View style={styles.loginType}>
+        <Text style={styles.dontAc}>
+          Already have an Account?
+          <Text style={styles.withOtp}>Sign in</Text>
+        </Text>
+      </View>
       <Modal
         visible={showAddPhoneModal}
         transparent={true}
@@ -132,7 +138,8 @@ const Register = () => {
               ))}
             </View>
             <Text style={{ marginBottom: 10 }}>
-              Didn’t receive the code? <Text style={styles.termsLabel}>Resend code</Text>
+              Didn’t receive the code?{" "}
+              <Text style={styles.termsLabel}>Resend code</Text>
             </Text>
             <Pressable
               onPress={() => setShowAddPhoneModal(false)}
@@ -248,24 +255,48 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 15,
   },
-  otpContainer:{
-   flexDirection:"row",
-   alignItems:"center",
-   justifyContent:"space-between",
-   flexWrap:"wrap"
+  otpContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
   },
-  box:{
-    borderRadius:13,
-    backgroundColor:"#FFFFFF",
-    borderWidth:1,
-    padding:2,
-    marginRight:3,
-    marginVertical:10
+  box: {
+    borderRadius: 13,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    padding: 2,
+    marginRight: 3,
+    marginVertical: 10,
   },
   otpInput: {
-  width: width * 0.1,
-  height: width * 0.12,
-  textAlign: "center",
-  fontSize: 18,
-},
+    width: width * 0.1,
+    height: width * 0.12,
+    textAlign: "center",
+    fontSize: 18,
+  },
+  loginType: {
+    marginVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+  },
+  withOtp: {
+    fontWeight: "700",
+    fontSize: 16,
+    textDecorationLine: "underline",
+    color: "blue",
+  },
+  dontAc: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: "blue",
+  },
+  typeBtn: {
+    marginVertical: 10,
+  },
+   gradientBox: {
+    borderRadius: 15,
+    transform: [{ rotate: '39.61deg' }],
+  },
 });

@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
   Modal,
+  Alert,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import Checkbox from "expo-checkbox";
@@ -36,7 +37,14 @@ const AppLogin = ({ navigation }) => {
   };
 
   const handleLogin = () => {
-    navigation.navigate("Home");
+    if (mail?.trim() && password?.trim()) {
+      navigation.navigate("Home");
+    } else {
+      Alert.alert(
+        "Missing Information",
+        "Please enter both email and password."
+      );
+    }
   };
 
   const handleSignUp = () => {
