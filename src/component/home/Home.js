@@ -24,6 +24,10 @@ const Home = ({navigation}) => {
         navigation.navigate('Investment');
     }
 
+    const handleCalculator = () => {
+       navigation.navigate('Calculator');  
+    }
+
     return (
         <View style={styles.main}>
             <View style={styles.header}>
@@ -122,15 +126,15 @@ const Home = ({navigation}) => {
             </ScrollView>
             <View style={styles.footerContainer}>
                 <Pressable style={styles.footerContentContainer}>
-                    <Image source={require('../../../assets/home.png')} />
+                    <Image source={require('../../../assets/home.png')}  style={styles.footerIcon}/>
                     <Text style={styles.footerLabel}>Home</Text>
                 </Pressable>
                 <Pressable style={styles.footerContentContainer}>
-                    <Image source={require('../../../assets/statementSummary.png')} />
-                    <Text style={styles.footerLabel}>Statement History</Text>
+                    <Image source={require('../../../assets/statementSummary.png')} style={styles.footerIcon} />
+                    <Text style={styles.footerLabel}>History</Text>
                 </Pressable>
-                <Pressable style={styles.footerContentContainer}>
-                    <Image source={require('../../../assets/offers.png')} />
+                <Pressable onPress={handleCalculator} style={styles.footerContentContainer}>
+                    <Image source={require('../../../assets/offers.png')} style={styles.footerIcon}/>
                     <Text style={styles.footerLabel}>Offers</Text>
                 </Pressable>
             </View>
@@ -433,18 +437,31 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         borderWidth: 1,
         borderRadius: 13,
-        padding: 10,
+        padding: 5
+        ,
         backgroundColor: "#FFFFFF",
         borderColor: "#00000040",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        marginHorizontal:5
     },
     footerContentContainer:{
-        alignItems:"center"
+        alignItems:"center",
+        flexDirection:"row",
+        backgroundColor:"#E6E7FF",
+        paddingVertical:5,
+        paddingHorizontal:15,
+        borderRadius:20
     },
     footerLabel:{
-        fontWeight:"400",
-        fontSize:12
+        fontWeight:"800",
+        fontSize:15,
+        marginLeft:5
+    },
+    footerIcon:{
+        height:height*0.03, 
+        width:width*0.06, 
+        resizeMode:"stretch"
     }
 })

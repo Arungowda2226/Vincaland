@@ -4,9 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 
 const { height, width } = Dimensions.get("window");
 
-const Header = ({ title, navigation, userIcon }) => {
+const Header = ({ title, navigation, userIcon, closeModal }) => {
   const handleBack = () => {
-    navigation.goBack();
+    if (closeModal) {
+      closeModal(false);
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -30,7 +34,7 @@ const Header = ({ title, navigation, userIcon }) => {
           source={require("../../../assets/profile.png")}
           style={{
             alignSelf: "flex-end",
-            height: height * 0.06,
+            height: height * 0.04,
             width: width * 0.06,
             resizeMode: "stretch",
           }}

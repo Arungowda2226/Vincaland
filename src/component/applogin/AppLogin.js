@@ -405,7 +405,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-
   bottomModal: {
     backgroundColor: "#fff",
     padding: 20,
@@ -413,19 +412,16 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     elevation: 5,
   },
-
   modalTitle: {
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 10,
   },
-
   modalText: {
     fontSize: 14,
     color: "#555",
     marginBottom: 15,
   },
-
   modalInput: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -435,14 +431,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
   modalButton: {
     backgroundColor: "#0516D3",
     paddingVertical: 12,
     alignItems: "center",
     borderRadius: 10,
   },
-
   modalButtonText: {
     color: "#fff",
     fontWeight: "600",

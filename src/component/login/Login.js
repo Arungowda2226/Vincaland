@@ -30,7 +30,7 @@ export default function Login() {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 24, paddingBottom: 100, marginTop: 20 }}>
+      <View style={{ flex: 1, padding: 24, paddingBottom: 100}}>
         <Image
           source={require("../../../assets/Vector.png")}
           style={{
@@ -39,7 +39,6 @@ export default function Login() {
             resizeMode: "stretch",
           }}
         />
-
         <Image
           source={require("../../../assets/Arrow.png")}
           style={{
@@ -47,16 +46,13 @@ export default function Login() {
             width: width * 0.15,
             height: height * 0.05,
             resizeMode: "stretch",
-            marginVertical: 10,
           }}
         />
         <Text style={styles.mainLabel}>Premium Members Dashboard</Text>
         <Text style={styles.welLabel}>
           {showLogin ? "Welcome back" : "Join us today"}
         </Text>
-
         <View style={styles.container}>
-          {/* Tabs */}
           <View style={styles.buttons}>
             <Pressable
               onPress={handleLogin}
@@ -71,7 +67,6 @@ export default function Login() {
                 Login
               </Text>
             </Pressable>
-
             <Pressable
               onPress={handleSignUp}
               style={[
@@ -86,34 +81,9 @@ export default function Login() {
               </Text>
             </Pressable>
           </View>
-
-          {/* Conditional Form */}
-          {showLogin && <LoginScreen />}
-          {showReg && <Register />}
+          {showLogin && <LoginScreen onSwitchToSignin={handleSignUp}/>}
+          {showReg && <Register onSwitchToLogin={handleLogin} />}
         </View>
-
-        {/* Extra Login Options */}
-        {/* {showLogin && (
-          <View style={styles.loginType}>
-            <Pressable style={styles.typeBtn}>
-              <Text style={styles.withOtp}>Login with OTP</Text>
-            </Pressable>
-            <Pressable style={styles.typeBtn}>
-              <Text style={styles.dontAc}>
-                Don't have an account?{" "}
-                <Text style={styles.withOtp}>Sign Up</Text>
-              </Text>
-            </Pressable>
-          </View>
-        )} */}
-        {/* {showReg && (
-          <View style={styles.loginType}>
-            <Text style={styles.dontAc}>
-              Already have an Account?
-              <Text style={styles.withOtp}>Sign in</Text>
-            </Text>
-          </View>
-        )} */}
       </View>
       <LinearGradient
             colors={["#0012DD", "#0514BC"]}
@@ -151,8 +121,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.14,
     shadowRadius: 4.2,
-    elevation: 5, // required for Android shadow
-     paddingBottom: 20,
+    elevation: 5,
   },
   buttons: {
     flexDirection: "row",
@@ -160,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 13,
     padding: 10,
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   loginBtn: {
     paddingHorizontal: 30,

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Dimensions,
   Image,
@@ -8,21 +8,52 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
+import axios from "axios";
+import API from "../apidetails/Api";
 
 const { width } = Dimensions.get("window");
 
-const Register = () => {
+const Register = ({ onSwitchToLogin }) => {
   const [isChecked, setChecked] = useState(false);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
 
+  // ✅ Added missing states
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+
   const otpRefs = useRef([]);
+
+  useEffect(() => {
+    console.log(otpDigits, "checkOTP");
+  }, [otpDigits]);
 
   const handleAddPhone = () => {
     setShowAddPhoneModal(true);
+    fetch(`${API}/investors/sendOtp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phoneNumber: phone,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Response:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   const handleOtpChange = (value, index) => {
@@ -43,16 +74,98 @@ const Register = () => {
     }
   };
 
+  const handleSignIn = () => {
+    if (!name || !email || !phone || !password || !confirmPassword) {
+      Alert.alert("Missing Fields", "Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Password Mismatch", "Passwords do not match");
+      return;
+    }
+
+    axios
+      .post(`${API}/investors/register`, {
+        name,
+        emailId: email,
+        password,
+        phoneNumber: phone,
+      })
+      .then((res) => {
+        console.log("User registered:", res.data);
+        Alert.alert("Success", "Account created successfully");
+        navigation.navigate("DashBoard", { userDetails: res.data.investor });
+      })
+      .catch((err) => {
+        console.error("Registration error:", err);
+        Alert.alert("Error", "Failed to create account");
+      });
+  };
+
+  const handleVerfityOtp = () => {
+    const otpCode = otpDigits.join(""); // Combine digits into one string
+
+    if (otpCode.length < 6) {
+      Alert.alert("Incomplete OTP", "Please enter all 6 digits of the OTP.");
+      return;
+    }
+
+    console.log(`${API}/investors/verify-otp`);
+    fetch(`${API}/investors/verify-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phoneNumber: phone,
+        otp: otpCode,
+        isSignup: false,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Response:", data);
+        if (!data.error) {
+          if (!data.error) {
+            Alert.alert("Success", "OTP verified successfully!");
+            setShowAddPhoneModal(false);
+            setIsPhoneVerified(true); // ✅ Set phone as verified
+          }
+        } else {
+          Alert.alert("Error", data.message || "OTP verification failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        Alert.alert("Network Error", "Failed to verify OTP. Please try again.");
+      });
+  };
+
+  const handleSignUp = () => {
+    onSwitchToLogin();
+  }
+
   return (
     <View style={styles.main}>
       <Text style={styles.createLabel}>Create Account</Text>
       <View style={styles.inputContainer}>
         <Text>Full Name</Text>
-        <TextInput placeholder="Enter your full name" style={styles.input} />
+        <TextInput
+          placeholder="Enter your full name"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+        />
       </View>
       <View style={styles.inputContainer}>
         <Text>Email Address</Text>
-        <TextInput placeholder="Enter your Email" style={styles.input} />
+        <TextInput
+          placeholder="Enter your Email"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+        />
       </View>
       <View style={styles.inputContainer}>
         <Text>Phone Number</Text>
@@ -66,23 +179,37 @@ const Register = () => {
           <TextInput
             placeholder="Verify your phone number"
             style={[styles.input, { width: "60%" }]}
+            value={phone}
+            onChangeText={setPhone}
           />
           <Pressable onPress={handleAddPhone} style={styles.phoneBtn}>
-            <Text>Add Phone</Text>
+            {isPhoneVerified ? (
+              <Ionicons name="checkmark-circle" size={24} color="green" />
+            ) : (
+              <Text style={{ color: "white" }}>Add Phone</Text>
+            )}
           </Pressable>
         </View>
       </View>
       <View style={styles.inputContainer}>
         <Text>Password</Text>
         <View style={styles.inputIcon}>
-          <TextInput placeholder="Enter your password" />
+          <TextInput
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+          />
           <Ionicons name={"eye"} size={20} />
         </View>
       </View>
       <View style={styles.inputContainer}>
         <Text>Re-enter Password</Text>
         <View style={styles.inputIcon}>
-          <TextInput placeholder="Re-enter your password" />
+          <TextInput
+            placeholder="Re-enter your password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
           <Ionicons name={"eye"} size={20} />
         </View>
       </View>
@@ -97,15 +224,15 @@ const Register = () => {
           <Text style={styles.termsLabel}>Terms and Conditions</Text>
         </Text>
       </View>
-      <Pressable style={styles.createBtn}>
+      <Pressable onPress={handleSignIn} style={styles.createBtn}>
         <Text style={styles.createBtnLabel}>Create Account</Text>
       </Pressable>
-      <View style={styles.loginType}>
+      <Pressable onPress={handleSignUp} style={styles.loginType}>
         <Text style={styles.dontAc}>
           Already have an Account?
-          <Text style={styles.withOtp}>Sign in</Text>
+            <Text style={styles.withOtp}>Sign in</Text>
         </Text>
-      </View>
+      </Pressable>
       <Modal
         visible={showAddPhoneModal}
         transparent={true}
@@ -141,10 +268,7 @@ const Register = () => {
               Didn’t receive the code?{" "}
               <Text style={styles.termsLabel}>Resend code</Text>
             </Text>
-            <Pressable
-              onPress={() => setShowAddPhoneModal(false)}
-              style={styles.modalButton}
-            >
+            <Pressable onPress={handleVerfityOtp} style={styles.modalButton}>
               <Text style={{ color: "white" }}>Submit</Text>
             </Pressable>
           </View>
@@ -279,7 +403,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30,
   },
   withOtp: {
     fontWeight: "700",
@@ -295,8 +418,18 @@ const styles = StyleSheet.create({
   typeBtn: {
     marginVertical: 10,
   },
-   gradientBox: {
+  gradientBox: {
     borderRadius: 15,
-    transform: [{ rotate: '39.61deg' }],
+    transform: [{ rotate: "39.61deg" }],
+  },
+  phoneBtn: {
+    padding: 15,
+    backgroundColor: "#5D17EB",
+    borderRadius: 13,
+    marginLeft: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 40,
+    minHeight: 40,
   },
 });
