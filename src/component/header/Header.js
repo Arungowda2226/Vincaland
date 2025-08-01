@@ -35,7 +35,7 @@ const Header = ({ title, navigation, userIcon, closeModal }) => {
           style={{
             alignSelf: "flex-end",
             height: height * 0.04,
-            width: width * 0.06,
+            width: width * 0.08,
             resizeMode: "stretch",
           }}
         />

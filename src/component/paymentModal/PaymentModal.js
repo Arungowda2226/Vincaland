@@ -60,98 +60,80 @@ const PaymentModal = ({ closeModal }) => {
   };
 
   // ✅ Confirm Payment Completion
-  const confirmPaymentCompletion = async () => {
-    if (!utrNumber.trim()) {
-      Alert.alert("Missing UTR", "Please enter your UTR number after payment.");
-      return;
-    }
-
-    setIsPaying(true);
-    try {
-      if (!token) throw new Error("User is not authenticated.");
-
-      const res = await fetch(`${BACKEND_URL}/payments/paymentUpdate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          paymentAmount: amountToPay,
-          utrNumber: utrNumber.trim(),
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(
-          errorData?.message || "Payment update failed. Please try again."
-        );
-      }
-
-      Alert.alert(
-        "Payment Submitted",
-        "Your payment is done. Amount will be credited to your wallet within 30 minutes. If not credited, please contact our support team.",
-        [{ text: "OK", onPress: () => closeModal(false) }]
-      );
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error", err.message || "Payment confirmation failed.");
-    } finally {
-      setIsPaying(false);
-    }
+  const confirmPaymentCompletion = () => {
+    fetch(`${API}/payments/paymentUpdate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        paymentAmount: amountToPay,
+        transactionId: utrNumber,
+      }),
+    })
+    .then(res=> res.json())
+    .then((data)=>{
+      console.log(data,"thisIsData");
+    })
+    .catch((err)=>{
+      console.log(err,"thisIsError");
+    })
   };
 
   return (
     <View style={styles.container}>
       <Header title={"Payment"} closeModal={closeModal} />
-
-      {/* QR Code Section */}
-      {qrCodeData ? (
-        <View style={styles.qrContainer}>
-          <QRCode
-            value={qrCodeData}
-            size={200}
-            color="black"
-            backgroundColor="white"
-            logoBackgroundColor="transparent"
-          />
-        </View>
-      ) : (
-        <View>
-            <View style={[styles.prepareBtn,{marginTop:40}]}>
-                <Text style={styles.submitText}>Monthly Subscription Amount : ₹{amountToPay}</Text>
+      <View style={styles.main}>
+        {/* QR Code Section */}
+        {qrCodeData ? (
+          <View style={styles.qrContainer}>
+            <QRCode
+              value={qrCodeData}
+              size={200}
+              color="black"
+              backgroundColor="white"
+              logoBackgroundColor="transparent"
+            />
+          </View>
+        ) : (
+          <View>
+            <View style={[styles.prepareBtn, { marginTop: 40 }]}>
+              <Text style={styles.submitText}>
+                Monthly Subscription Amount : ₹{amountToPay}
+              </Text>
             </View>
             <Pressable style={styles.prepareBtn} onPress={preparePayment}>
-            <Text style={styles.submitText}>Generate QR Code</Text>
+              <Text style={styles.submitText}>Generate QR Code</Text>
             </Pressable>
-        </View>
-      )}
+          </View>
+        )}
 
-      {/* Info Section */}
-      {qrCodeData !== "" && (
-        <>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter UTR Number"
-            value={utrNumber}
-            onChangeText={setUtrNumber}
-            keyboardType="numeric"
-          />
+        {/* Info Section */}
+        {qrCodeData !== "" && (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter UTR Number"
+              value={utrNumber}
+              onChangeText={setUtrNumber}
+              keyboardType="numeric"
+            />
 
-          <Pressable
-            style={styles.submitBtn}
-            onPress={confirmPaymentCompletion}
-            disabled={isPaying}
-          >
-            {isPaying ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.submitText}>Submit Payment</Text>
-            )}
-          </Pressable>
-        </>
-      )}
+            <Pressable
+              style={styles.submitBtn}
+              onPress={confirmPaymentCompletion}
+              disabled={isPaying}
+            >
+              {isPaying ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitText}>Submit Payment</Text>
+              )}
+            </Pressable>
+          </>
+        )}
+      </View>
     </View>
   );
 };
@@ -159,7 +141,8 @@ const PaymentModal = ({ closeModal }) => {
 export default PaymentModal;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  container: { flex: 1, backgroundColor: "#fff" },
+  main: { flex: 1, padding: 24 },
   qrContainer: { marginVertical: 30, alignItems: "center" },
   input: {
     marginHorizontal: 10,
@@ -181,7 +164,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#5D17EB",
     paddingVertical: 12,
     borderRadius: 10,
-    marginVertical:10,
+    marginVertical: 10,
     alignItems: "center",
   },
   submitText: { color: "#fff", fontWeight: "bold", fontSize: 16 },

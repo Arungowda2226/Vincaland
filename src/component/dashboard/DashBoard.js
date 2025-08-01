@@ -19,6 +19,7 @@ import { BarChart } from "react-native-gifted-charts";
 import PaymentModal from "../paymentModal/PaymentModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReferForm from "../refer/ReferForm";
+import WithdrawnModal from "../withdrawn/WithdrawnModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,6 +29,9 @@ const DashBoard = ({ navigation, route }) => {
   const [isChart, setIsChart] = useState(false);
   const [dashBoardDetails, setDashBoardDetails] = useState({});
   const [paymentInfos, setPaymentInfos] = useState([]);
+  const [showQrCode, setShowQrCode] = useState(false);
+  const [showReferForm, setShowReferForm] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const nextDueAmount = 1200;
   const MONTHLY_RETURN = 3000;
   const currentInvested = dashBoardDetails.investedAmount;
@@ -220,15 +224,16 @@ const DashBoard = ({ navigation, route }) => {
     return totalReturnsSoFar + invested * 3;
   }
 
-  const [showQrCode, setShowQrCode] = useState(false);
-  const [showReferForm, setShowReferForm] = useState(false);
-
   const generateQrCode = () => {
     setShowQrCode(true);
   };
 
   const handleShowReferForm = () => {
     setShowReferForm(true);
+  }
+
+  const handleWithdraw = () => {
+    setShowWithdrawModal(true);
   }
 
   return (
@@ -255,7 +260,7 @@ const DashBoard = ({ navigation, route }) => {
               Ready to withdraw anytime
             </Text>
           </View>
-          <Pressable style={styles.withdrawBtn}>
+          <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
             <Ionicons name="wallet-outline" size={20} color={"white"} />
             <Text style={styles.withdrawBtnLabel}>withdraw</Text>
           </Pressable>
@@ -286,6 +291,24 @@ const DashBoard = ({ navigation, route }) => {
             </View>
           </View>
         </View>
+        <Pressable
+          onPress={handleShowReferForm}
+          style={{
+            padding: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor:"#f0dd9fff",
+            borderRadius:13,
+            marginVertical:10
+          }}
+        >
+          <View style={{flexDirection:"row", alignItems:"center"}}>
+            <Ionicons name="chatbubble-ellipses-outline" size={30} />
+            <Text style={{marginLeft:10, fontWeight:"600", fontSize:14}}>Message & Refer</Text>
+          </View>
+          <Ionicons name="chevron-forward-outline" size={30} />
+        </Pressable>
         <View
           style={{
             padding: 10,
@@ -507,31 +530,15 @@ const DashBoard = ({ navigation, route }) => {
             </Pressable>
           </View>
         </View>
-        <Pressable
-          onPress={handleShowReferForm}
-          style={{
-            padding: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor:"#FFFFFF",
-            borderRadius:13,
-            marginVertical:10
-          }}
-        >
-          <View style={{flexDirection:"row", alignItems:"center"}}>
-            <Ionicons name="chatbubble-ellipses-outline" size={30} />
-            <Text style={{marginLeft:10, fontWeight:"600", fontSize:14}}>Message & Refer</Text>
-          </View>
-
-          <Ionicons name="chevron-forward-outline" size={30} />
-        </Pressable>
       </ScrollView>
       <Modal visible={showQrCode}>
         <PaymentModal closeModal={setShowQrCode} />
       </Modal>
       <Modal visible={showReferForm} animationType="slide">
         <ReferForm closeModal={setShowReferForm} />
+      </Modal>
+      <Modal visible={showWithdrawModal} animationType="slide">
+        <WithdrawnModal closeModal={setShowWithdrawModal} />
       </Modal>
     </View>
   );

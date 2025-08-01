@@ -11,10 +11,11 @@ import LoginScreen from "./LoginScreen";
 import Register from "./Register";
 import { Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-export default function Login() {
+export default function Login({navigation}) {
   const [showLogin, setShowLogin] = useState(true);
   const [showReg, setShowReg] = useState(false);
 
@@ -28,17 +29,28 @@ export default function Login() {
     setShowReg(true);
   };
 
+  const handleBack = () => {
+    navigation.goBack();
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 24, paddingBottom: 100}}>
-        <Image
-          source={require("../../../assets/Vector.png")}
-          style={{
-            width: width * 0.12,
-            height: height * 0.06,
-            resizeMode: "stretch",
-          }}
-        />
+      <View style={{ flex: 1, padding: 24, paddingBottom: 100 }}>
+        <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", marginVertical:10}}>
+          <Pressable onPress={handleBack} style={{flexDirection:"row", alignItems:"center", padding:10, backgroundColor:"#5D17EB", borderRadius:13}}>
+            <Ionicons name="chevron-back-outline" size={30} color={"#FFFFFF"}/>
+            <Text style={{marginLeft:5, color:"#FFFFFF", fontWeight:"600", fontSize:16}}>BACK</Text>
+          </Pressable>
+          <Image
+            source={require("../../../assets/Vector.png")}
+            style={{
+              width: width * 0.12,
+              height: height * 0.06,
+              resizeMode: "stretch",
+            }}
+          />
+          <View style={{width:"25%"}}/>
+        </View>
         <Image
           source={require("../../../assets/Arrow.png")}
           style={{
@@ -81,16 +93,16 @@ export default function Login() {
               </Text>
             </Pressable>
           </View>
-          {showLogin && <LoginScreen onSwitchToSignin={handleSignUp}/>}
+          {showLogin && <LoginScreen onSwitchToSignin={handleSignUp} />}
           {showReg && <Register onSwitchToLogin={handleLogin} />}
         </View>
       </View>
       <LinearGradient
-            colors={["#0012DD", "#0514BC"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.gradientBox}
-          />
+        colors={["#0012DD", "#0514BC"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradientBox}
+      />
     </ScrollView>
   );
 }
@@ -161,8 +173,8 @@ const styles = StyleSheet.create({
   typeBtn: {
     marginVertical: 10,
   },
-   gradientBox: {
+  gradientBox: {
     borderRadius: 15,
-    transform: [{ rotate: '39.61deg' }],
+    transform: [{ rotate: "39.61deg" }],
   },
 });

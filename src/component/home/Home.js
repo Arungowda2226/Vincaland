@@ -437,20 +437,20 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         borderWidth: 1,
         borderRadius: 13,
-        padding: 5
-        ,
+        padding: 5,
         backgroundColor: "#FFFFFF",
         borderColor: "#00000040",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginHorizontal:5
+        marginHorizontal:5,
+        marginBottom:30
     },
     footerContentContainer:{
         alignItems:"center",
         flexDirection:"row",
         backgroundColor:"#E6E7FF",
-        paddingVertical:5,
+        paddingVertical:10,
         paddingHorizontal:15,
         borderRadius:20
     },
