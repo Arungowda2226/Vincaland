@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import {
@@ -15,6 +16,8 @@ import {
   Button as RegButton,
 } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 const titleOptions = [
   { label: "Mr", value: "1" },
@@ -40,9 +43,9 @@ const PersonalDetails = ({
   formData,
   setFormData,
 }) => {
-  const [title, setTitle] = useState(null);
-  const [gender, setGender] = useState(null);
-  const [maritalStatus, setMaritalStatus] = useState(null);
+  const [title, setTitle] = useState("Mr");
+  const [gender, setGender] = useState("Male");
+  const [maritalStatus, setMaritalStatus] = useState("Single");
   const [isSameAddress, setIsSameAddress] = useState(false);
   const [fullName, setFullName] = useState("");
   const [fatherName, setFatherName] = useState("");
@@ -55,6 +58,8 @@ const PersonalDetails = ({
   const [permanentState, setPermanentState] = useState("");
   const [permanentPincode, setPermanentPincode] = useState("");
   const [cibil, setCibil] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleNext = () => {
     const formData = {
@@ -69,6 +74,8 @@ const PersonalDetails = ({
       currentState,
       currentPincode,
       isSameAddress,
+      cibil,
+      dateOfBirth:date,
       permanentAddress: isSameAddress ? currentAddress : permanentAddress,
       permanentState: isSameAddress ? currentState : permanentState,
       permanentPincode: isSameAddress ? currentPincode : permanentPincode,
@@ -76,6 +83,16 @@ const PersonalDetails = ({
     setFormData(formData);
     showCheck(false);
     markComplete(true);
+  };
+
+   const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowPicker(Platform.OS === 'ios'); // Hide picker on iOS after selection
+    setDate(currentDate);
+  };
+
+  const showDatePicker = () => {
+    setShowPicker(true);
   };
 
   return (
@@ -89,7 +106,7 @@ const PersonalDetails = ({
           valueField="value"
           placeholder="Mr"
           value={title}
-          onChange={(item) => setTitle(item.value)}
+          onChange={(item) => setTitle(item.label)}
         />
         <TextInput
           placeholder="Michel Joseph"
@@ -138,7 +155,7 @@ const PersonalDetails = ({
             data={maritalStatusOptions}
             labelField="label"
             valueField="value"
-            placeholder="Married"
+            placeholder="Single"
             value={maritalStatus}
             onChange={(item) => setMaritalStatus(item.value)}
           />
@@ -167,7 +184,7 @@ const PersonalDetails = ({
       >
         <Text style={styles.label}>Spouse Name :</Text>
         <TextInput
-          placeholder="Bency Michel"
+          placeholder="Enter Spouse name"
           style={[styles.input, { marginLeft: 10, flex: 1 }]}
           value={spouseName}
           onChangeText={setSpouseName}
@@ -183,10 +200,22 @@ const PersonalDetails = ({
       >
         <Text style={styles.label}>Date of Birth :</Text>
         <View style={styles.dateBirthContainer}>
-          <TextInput value={cibil} onChangeText={setCibil} placeholder="Select Date of Birth"/>
-          <Ionicons name={"calendar-outline"} size={24} />
+          <TextInput value={date < new Date() ? date.toLocaleDateString() :""} placeholder="Select Date of Birth" editable={false}/>
+          <Ionicons onPress={showDatePicker} name={"calendar-outline"} size={24} />
         </View>
+
+        {showPicker && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode="date" // Can be 'date', 'time', or 'datetime'
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'} // 'spinner' for iOS, 'default' for Android
+          onChange={onChange}
+        />
+      )}
+
       </View>
+
 
       <View
         style={{
@@ -321,7 +350,6 @@ const styles = StyleSheet.create({
     borderColor: "#FFD4C3",
     borderWidth: 1,
     borderRadius: 13,
-    paddingBottom: 100,
   },
   heading: { fontSize: 18, fontWeight: "bold", marginBottom: 16 },
   row: { flexDirection: "row", marginBottom: 10 },

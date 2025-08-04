@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import React, { useState } from "react";
 import Header from "../header/Header";
 import Svg, { Defs, LinearGradient, Stop, Ellipse } from "react-native-svg";
 import { Dropdown } from "react-native-element-dropdown";
@@ -14,26 +14,15 @@ const Calculator = ({ navigation }) => {
   const [presentValue, setPresentValue] = useState(100000);
   const [inflationRate, setInflationRate] = useState(6);
   const [inflationYears, setInflationYears] = useState(10);
-  const [futureValue, setFutureValue] = useState(0);
+  const [futureValue, setFutureValue] = useState(null);
 
   const [calculatorType, setCalculatorType] = useState("");
   const [loanAmount, setLoanAmount] = useState(550000);
   const [interestRate, setInterestRate] = useState(8);
   const [loanPeriod, setLoanPeriod] = useState(5);
-  const [emi, setEmi] = useState(0);
+  const [emi, setEmi] = useState(null);
 
-  useEffect(() => {
-    calculateEMI();
-    calculateFutureValue();
-  }, [
-    loanAmount,
-    interestRate,
-    loanPeriod,
-    presentValue,
-    inflationRate,
-    inflationYears,
-  ]);
-
+  // ✅ Calculate EMI on button click
   const calculateEMI = () => {
     const principal = loanAmount;
     const monthlyRate = interestRate / 12 / 100;
@@ -46,6 +35,7 @@ const Calculator = ({ navigation }) => {
     setEmi(Math.ceil(emiValue).toFixed(2));
   };
 
+  // ✅ Calculate Future Value on button click
   const calculateFutureValue = () => {
     const futureVal =
       presentValue * Math.pow(1 + inflationRate / 100, inflationYears);
@@ -80,8 +70,13 @@ const Calculator = ({ navigation }) => {
           valueField="type"
           placeholder="Select Calculator"
           value={calculatorType}
-          onChange={(item) => setCalculatorType(item.type)}
+          onChange={(item) => {
+            setCalculatorType(item.type);
+            setEmi(null);
+            setFutureValue(null);
+          }}
         />
+
         {calculatorType === "EMI calculator" && (
           <View style={styles.box}>
             {/* Loan Amount */}
@@ -98,7 +93,7 @@ const Calculator = ({ navigation }) => {
               onValueChange={setLoanAmount}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3"  
+              thumbTintColor="#FFADD3"
             />
 
             {/* Interest Rate */}
@@ -115,7 +110,7 @@ const Calculator = ({ navigation }) => {
               onValueChange={setInterestRate}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3" 
+              thumbTintColor="#FFADD3"
             />
 
             {/* Loan Period */}
@@ -132,14 +127,21 @@ const Calculator = ({ navigation }) => {
               onValueChange={setLoanPeriod}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3" 
+              thumbTintColor="#FFADD3"
             />
 
-            {/* EMI Result */}
-            <View style={styles.resultBox}>
-              <Text style={styles.resultLabel}>Estimated EMI</Text>
-              <Text style={styles.resultValue}>₹{emi}</Text>
-            </View>
+            {/* Calculate Button */}
+            <Pressable style={styles.calculateBtn} onPress={calculateEMI}>
+              <Text style={styles.calculateText}>Calculate EMI</Text>
+            </Pressable>
+
+            {/* Show EMI only after calculation */}
+            {/* {emi && (
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Estimated EMI</Text>
+                <Text style={styles.resultValue}>₹{emi}</Text>
+              </View>
+            )} */}
           </View>
         )}
 
@@ -159,7 +161,7 @@ const Calculator = ({ navigation }) => {
               onValueChange={setPresentValue}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3" 
+              thumbTintColor="#FFADD3"
             />
 
             {/* Inflation Rate */}
@@ -176,7 +178,7 @@ const Calculator = ({ navigation }) => {
               onValueChange={setInflationRate}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3" 
+              thumbTintColor="#FFADD3"
             />
 
             {/* Years */}
@@ -193,14 +195,105 @@ const Calculator = ({ navigation }) => {
               onValueChange={setInflationYears}
               minimumTrackTintColor="#FFADD3"
               maximumTrackTintColor="#1BD0C7"
-              thumbTintColor="#FFADD3" 
+              thumbTintColor="#FFADD3"
             />
 
-            {/* Future Value Result */}
-            <View style={styles.resultBox}>
-              <Text style={styles.resultLabel}>Future Cost:</Text>
-              <Text style={styles.resultValue}>₹{futureValue}</Text>
-            </View>
+            {/* Calculate Button */}
+            <Pressable
+              style={styles.calculateBtn}
+              onPress={calculateFutureValue}
+            >
+              <Text style={styles.calculateText}>Calculate Future Value</Text>
+            </Pressable>
+
+            {/* Show result only after calculation */}
+            {/* {futureValue && (
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Future Cost:</Text>
+                <Text style={styles.resultValue}>₹{futureValue}</Text>
+              </View>
+            )} */}
+          </View>
+        )}
+        {(emi || futureValue) && (
+          <View style={styles.footerBox}>
+            {calculatorType === "EMI calculator" && emi && (
+              <>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.detailsBox}>
+                    <Text>Monthly EMI</Text>
+                    <Text>₹{emi}</Text>
+                  </View>
+                  <View style={styles.detailsBox}>
+                    <Text>Principal Amount</Text>
+                    <Text>₹{loanAmount.toLocaleString()}</Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View style={styles.detailsBox}>
+                    <Text>Total Interest</Text>
+                    <Text>
+                      ₹{(emi * loanPeriod * 12 - loanAmount).toLocaleString()}
+                    </Text>
+                  </View>
+                  <View style={styles.detailsBox}>
+                    <Text>Total Amount</Text>
+                    <Text>₹{(emi * loanPeriod * 12).toLocaleString()}</Text>
+                  </View>
+                </View>
+              </>
+            )}
+
+            {calculatorType === "inflation calculator" && futureValue && (
+              <>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.detailsBox}>
+                    <Text>Future Value</Text>
+                    <Text>₹{futureValue.toLocaleString()}</Text>
+                  </View>
+                  <View style={styles.detailsBox}>
+                    <Text>Current Value</Text>
+                    <Text>₹{presentValue.toLocaleString()}</Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View style={styles.detailsBox}>
+                    <Text>Annual Rate</Text>
+                    <Text>{inflationRate}%</Text>
+                  </View>
+                  <View style={styles.detailsBox}>
+                    <Text>Time Period</Text>
+                    <Text>{inflationYears} years</Text>
+                  </View>
+                </View>
+              </>
+            )}
           </View>
         )}
       </View>
@@ -211,28 +304,22 @@ const Calculator = ({ navigation }) => {
 export default Calculator;
 
 const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-  },
+  main: { flex: 1 },
   ellipseContainer: {
     position: "absolute",
     top: -332,
     left: -282,
     zIndex: -1,
   },
-  ellipse: {
-    transform: [{ rotate: "-14.55deg" }],
-  },
-  content: {
-    flex: 1,
-  },
+  ellipse: { transform: [{ rotate: "-14.55deg" }] },
+  content: { flex: 1 },
   dropdownShort: {
     borderRadius: 8,
     paddingHorizontal: 10,
     padding: 10,
     marginHorizontal: 10,
     marginVertical: 10,
-    backgroundColor:"#F9F9F9",
+    backgroundColor: "#F9F9F9",
     shadowColor: "#00000040",
     shadowOpacity: 0.25,
     shadowRadius: 5.3,
@@ -249,16 +336,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 10,
     marginVertical: 10,
+    paddingBottom: 60,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: 5,
   },
-  slider: {
-    width: "100%",
-    height: 40,
+  slider: { width: "100%", height: 40 },
+  calculateBtn: {
+    backgroundColor: "#0654BB",
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 15,
+    alignItems: "center",
   },
+  calculateText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   resultBox: {
     marginTop: 20,
     backgroundColor: "#f1f1f1",
@@ -266,13 +359,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  resultLabel: {
-    fontSize: 16,
-    color: "#888",
+  resultLabel: { fontSize: 16, color: "#888" },
+  resultValue: { fontSize: 24, fontWeight: "bold", color: "#333" },
+  detailsBox: {
+    padding: 15,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#00000040",
+    borderRadius: 13,
+    width: "45%",
   },
-  resultValue: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
+  footerBox: {
+    position: "absolute",
+    bottom: 50,
+    left: 20,
+    right: 20,
   },
 });

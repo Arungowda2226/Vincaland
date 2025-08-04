@@ -36,16 +36,38 @@ const AppLogin = ({ navigation }) => {
     setShowPass(!showPass);
   };
 
-  const handleLogin = () => {
-    if (mail?.trim() && password?.trim()) {
-      navigation.navigate("Home");
-    } else {
-      Alert.alert(
-        "Missing Information",
-        "Please enter both email and password."
-      );
-    }
-  };
+const handleLogin = () => {
+  console.log("click");
+
+  if (mail?.trim() && password?.trim()) {
+    const url = "http://192.168.0.146:3000/auth/login"; // ✅ Added port 3000
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // ✅ Important
+      },
+      body: JSON.stringify({
+        email: mail,
+        password: password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsData");
+        navigation.navigate("Home",{loginUser: data});
+      })
+      .catch((err) => {
+        console.log(err, "thisIsError");
+      });
+  } else {
+    Alert.alert(
+      "Missing Information",
+      "Please enter both email and password."
+    );
+  }
+};
+
 
   const handleSignUp = () => {
     navigation.navigate("AppSignUp");

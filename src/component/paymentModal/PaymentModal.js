@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
@@ -13,55 +14,33 @@ import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API from "../apidetails/Api";
 
-const BACKEND_URL = API;
-
 const PaymentModal = ({ closeModal }) => {
   const [token, setToken] = useState(null);
   const [utrNumber, setUtrNumber] = useState("");
   const [amountToPay, setAmountToPay] = useState(1200); // default
-  const [qrCodeData, setQrCodeData] = useState("");
   const [isPaying, setIsPaying] = useState(false);
+
+  // ✅ Pre-generate QR Code Data
+  const qrCodeData = `upi://pay?mc=5968&pa=yespay.smessi24427@yesbankltd&pn=VINCALAND SERVICES PRIVATE LIMITED&am=${amountToPay}`;
 
   // ✅ Fetch token from AsyncStorage
   useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const storedToken = await AsyncStorage.getItem("token");
+    AsyncStorage.getItem("token")
+      .then((storedToken) => {
         if (storedToken) {
           console.log(storedToken, "thisIsAsyncToken");
           setToken(storedToken);
         } else {
           console.log("No token found in AsyncStorage");
         }
-      } catch (error) {
-        console.error("Error reading token from AsyncStorage:", error);
-      }
-    };
-
-    fetchToken();
+      })
+      .catch((error) => console.error("Error reading token:", error));
   }, []);
-
-  // ✅ Prepare Payment (generate QR Code)
-  const preparePayment = () => {
-    if (!amountToPay || amountToPay < 1000 || amountToPay > 5000) {
-      Alert.alert(
-        "Invalid Amount",
-        "Please enter a valid amount between ₹1000 and ₹5000."
-      );
-      return;
-    }
-
-    const upiString = `upi://pay?mc=5968&pa=yespay.smessi24427@yesbankltd&pn=VINCALAND SERVICES PRIVATE LIMITED&am=${amountToPay}`;
-    setQrCodeData(upiString);
-    Alert.alert(
-      "QR Code Ready",
-      `Scan the QR code to pay ₹${amountToPay}. After payment, enter your UTR number.`
-    );
-  };
 
   // ✅ Confirm Payment Completion
   const confirmPaymentCompletion = () => {
-    fetch(`${API}/payments/paymentUpdate`, {
+    setIsPaying(true);
+    fetch(`${API}/investors/paymentUpdate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -72,68 +51,70 @@ const PaymentModal = ({ closeModal }) => {
         transactionId: utrNumber,
       }),
     })
-    .then(res=> res.json())
-    .then((data)=>{
-      console.log(data,"thisIsData");
-    })
-    .catch((err)=>{
-      console.log(err,"thisIsError");
-    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsData");
+        Alert.alert(
+          "Payment Submitted",
+          "Your payment is done. Amount will be credited to your wallet within 30 minutes. If not credited, please contact our support team.",
+          [{ text: "OK", onPress: () => closeModal(false) }]
+        );
+      })
+      .catch((err) => {
+        console.log(err, "thisIsError");
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      })
+      .finally(() => setIsPaying(false));
   };
 
   return (
     <View style={styles.container}>
       <Header title={"Payment"} closeModal={closeModal} />
-      <View style={styles.main}>
+      <ScrollView style={styles.main}>
+        {/* Monthly Subscription Info */}
+        <View style={styles.amountBox}>
+          <Text style={styles.amountText}>
+            Monthly Subscription Amount : ₹{amountToPay}
+          </Text>
+        </View>
+
         {/* QR Code Section */}
-        {qrCodeData ? (
-          <View style={styles.qrContainer}>
-            <QRCode
-              value={qrCodeData}
-              size={200}
-              color="black"
-              backgroundColor="white"
-              logoBackgroundColor="transparent"
-            />
-          </View>
-        ) : (
-          <View>
-            <View style={[styles.prepareBtn, { marginTop: 40 }]}>
-              <Text style={styles.submitText}>
-                Monthly Subscription Amount : ₹{amountToPay}
-              </Text>
-            </View>
-            <Pressable style={styles.prepareBtn} onPress={preparePayment}>
-              <Text style={styles.submitText}>Generate QR Code</Text>
-            </Pressable>
-          </View>
-        )}
+        <View style={styles.qrContainer}>
+          <QRCode
+            value={qrCodeData}
+            size={200}
+            color="black"
+            backgroundColor="white"
+            logoBackgroundColor="transparent"
+          />
+        </View>
 
-        {/* Info Section */}
-        {qrCodeData !== "" && (
-          <>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter UTR Number"
-              value={utrNumber}
-              onChangeText={setUtrNumber}
-              keyboardType="numeric"
-            />
+        <Text style={styles.noteText}>
+          Scan this QR code and pay the amount. Once the payment is completed,
+          enter your UTR number and click "Submit Payment".
+        </Text>
 
-            <Pressable
-              style={styles.submitBtn}
-              onPress={confirmPaymentCompletion}
-              disabled={isPaying}
-            >
-              {isPaying ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.submitText}>Submit Payment</Text>
-              )}
-            </Pressable>
-          </>
-        )}
-      </View>
+        {/* UTR Input and Submit */}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter UTR Number"
+          value={utrNumber}
+          onChangeText={setUtrNumber}
+          keyboardType="numeric"
+        />
+
+        <Pressable
+          style={styles.submitBtn}
+          onPress={confirmPaymentCompletion}
+          disabled={isPaying || utrNumber.trim() === ""}
+        >
+          {isPaying ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitText}>Submit Payment</Text>
+          )}
+        </Pressable>
+      </ScrollView>
     </View>
   );
 };
@@ -144,6 +125,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   main: { flex: 1, padding: 24 },
   qrContainer: { marginVertical: 30, alignItems: "center" },
+  noteText: {
+    marginTop: 15,
+    // textAlign: "center",
+    color: "#555",
+    fontSize: 14,
+    paddingHorizontal: 20,
+    fontWeight:"800"
+  },
   input: {
     marginHorizontal: 10,
     borderWidth: 1,
@@ -160,12 +149,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignItems: "center",
   },
-  prepareBtn: {
+  amountBox: {
     backgroundColor: "#5D17EB",
     paddingVertical: 12,
     borderRadius: 10,
     marginVertical: 10,
     alignItems: "center",
   },
+  amountText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   submitText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

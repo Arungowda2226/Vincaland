@@ -298,7 +298,7 @@ const DashBoard = ({ navigation, route }) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor:"#f0dd9fff",
+            backgroundColor:"#FCC92F",
             borderRadius:13,
             marginVertical:10
           }}

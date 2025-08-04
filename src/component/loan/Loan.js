@@ -17,6 +17,7 @@ import PersonalDetails from "./PersonalDetails";
 import ContactInformationForm from "./ContactInformationForm";
 import Svg, { Defs, LinearGradient, Stop, Ellipse } from "react-native-svg";
 import LoanType from "./LoanType";
+import SupportModal from "../supportmodal/SupportModal";
 
 const Loan = ({ navigation }) => {
   const [sections, setSections] = useState({
@@ -48,17 +49,77 @@ const Loan = ({ navigation }) => {
     }));
   };
 
-  const handleNext = () => {
-    const formData = {
-      personalData,
-      contactData,
-      identityData,
-      employmentData,
-      loanType,
+  // const handleNext = () => {
+  //   const formData = {
+  //     personalData,
+  //     contactData,
+  //     identityData,
+  //     employmentData,
+  //     loanType,
+  //   };
+  //   console.log(formData, "formData");
+  //   setShowModal(true);
+  //   // navigation.navigate("KYC", { formData });
+  // };
+
+  const handleNext = async () => {
+    const payload = {
+      title: personalData.title,
+      fullName: personalData.fullName,
+      fathersName: personalData.fatherName,
+      mothersName: personalData.motherName,
+      maritalStatus: personalData.maritalStatus,
+      gender: personalData.gender,
+      spouseName: personalData.spouseName,
+      dateofBirth: personalData.dateOfBirth,
+      cibilScore: parseInt(personalData.cibil),
+
+      currentAddress: {
+        address: personalData.currentAddress,
+        state: personalData.currentState,
+        pincode: personalData.currentPincode,
+      },
+      currentAddressSameAsPermanent: personalData.isSameAddress || false,
+
+      permanentAddress: {
+        address: personalData.permanentAddress,
+        state: personalData.permanentState,
+        pincode: personalData.permanentPincode,
+      },
+
+      contactDetails: {
+        phoneNumber: contactData.phoneNumber,
+        email: contactData.email,
+        alternatePhoneNumber: contactData.altNum,
+      },
+
+      loanType: loanType.selectedLoanType,
     };
-    console.log(formData, "formData");
-    setShowModal(true);
-    // navigation.navigate("KYC", { formData });
+
+    console.log("Submitting payload:", payload);
+
+    try {
+      const response = await fetch(
+        "http://192.168.0.146:3000/user_personal_details",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Server Response:", data);
+
+      if (data.status) {
+        setShowModal(true);
+      } else {
+        Alert.alert("Error", data.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      Alert.alert("Network Error", "Failed to submit data to the server");
+    }
   };
 
   const renderSection = (label, key, FormComponent, data, setData) => (
@@ -153,23 +214,7 @@ const Loan = ({ navigation }) => {
         animationType="fade"
         onRequestClose={() => setShowModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Image source={require("../../../assets/congrat.png")} />
-            <Text style={styles.infoLabel}>
-              Your application has been successfully submitted. Our team will
-              contact you within 2 hours.
-            </Text>
-            <Pressable
-              onPress={() => {
-                setShowModal(false), navigation.navigate("Home");
-              }}
-              style={styles.modalButton}
-            >
-              <Text style={{ color: "white" }}>DONE</Text>
-            </Pressable>
-          </View>
-        </View>
+        <SupportModal setShowModal={setShowModal} navigation={navigation}/>
       </Modal>
     </View>
   );
