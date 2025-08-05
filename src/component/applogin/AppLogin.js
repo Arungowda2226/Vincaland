@@ -12,6 +12,9 @@ import {
 import React, { useRef, useState } from "react";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
+import LoanApi from "../apidetails/LoanApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/userSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,6 +31,8 @@ const AppLogin = ({ navigation }) => {
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const otpRefs = useRef([]);
 
+  const dispatch = useDispatch();
+
   const iconSource = showPass
     ? require("../../../assets/hideEye.png")
     : require("../../../assets/eye.png");
@@ -37,15 +42,13 @@ const AppLogin = ({ navigation }) => {
   };
 
 const handleLogin = () => {
-  console.log("click");
-
   if (mail?.trim() && password?.trim()) {
-    const url = "http://192.168.0.146:3000/auth/login"; // ✅ Added port 3000
+    const url = `${LoanApi}/auth/login`;
 
     fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json", // ✅ Important
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email: mail,
@@ -55,7 +58,11 @@ const handleLogin = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data, "thisIsData");
-        navigation.navigate("Home",{loginUser: data});
+        dispatch(setUser(data)); 
+        navigation.replace("Main");
+        // navigation.navigate('Main', { loginUser: data });
+        // navigation.navigate('Main', { screen: 'Home', params: { loginUser: data } });
+        // navigation.navigate("Home",{loginUser: data});
       })
       .catch((err) => {
         console.log(err, "thisIsError");
@@ -67,7 +74,6 @@ const handleLogin = () => {
     );
   }
 };
-
 
   const handleSignUp = () => {
     navigation.navigate("AppSignUp");

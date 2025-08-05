@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import Checkbox from "expo-checkbox";
+import LoanApi from "../apidetails/LoanApi";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,6 +23,7 @@ const AppSignUp = ({navigation}) => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [imageUrl, setImageUrl] = useState('');
 
   const iconSource = showPass
     ? require('../../../assets/hideEye.png')
@@ -41,6 +43,33 @@ const iconConfirm = showConfirmPass
 
   const handleSignUp = () => {
     navigation.navigate("appLogin")
+  }
+
+  const handleCreateAccount = () => {
+    console.log("clickedCreateAccount");
+    const bodyData = {
+      fullName: fullName,
+      email: email,
+      phone: phone,
+      password: password,
+      confirmPassword: confirmPassword,
+    }
+
+    fetch(`${LoanApi}/auth/register`,{
+      method:"POST",
+      headers:{
+         "Content-Type": "application/json"
+      },
+      body:JSON.stringify(bodyData)
+    })
+    .then(res=>res.json())
+    .then((data)=>{
+      console.log(data,"thisIsData");
+      navigation.navigate('Main', { loginUser: data });
+    })
+    .catch((err)=>{
+      console.log(err,"thisIsError");
+    })
   }
 
   return (
@@ -140,7 +169,7 @@ const iconConfirm = showConfirmPass
             <Text style={styles.paragraph}>I Agree to <Text style={{color:"#4630EB"}}>Terms</Text> and <Text style={{color:"#4630EB"}}>Conditions</Text></Text>
           </View>
         </View>
-        <Pressable style={styles.loginBtn}>
+        <Pressable onPress={handleCreateAccount} style={styles.loginBtn}>
           <Text style={styles.loginLabel}>Create account</Text>
         </Pressable>
         <View style={styles.doHaveBox}>

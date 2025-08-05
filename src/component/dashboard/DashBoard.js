@@ -55,11 +55,11 @@ const DashBoard = ({ navigation, route }) => {
     if (item.invested)
       stacks.push({
         value: item.invested,
-        color: "#6A0DAD",
+        color: "#1315CD",
         label: "Invested",
       });
     if (item.returns)
-      stacks.push({ value: item.returns, color: "#00C853", label: "Returns" });
+      stacks.push({ value: item.returns, color: "#3DC426", label: "Returns" });
     return { label: item.month, stacks };
   });
 
@@ -241,7 +241,7 @@ const DashBoard = ({ navigation, route }) => {
       <Header
         title={"Premium Member Dashboard"}
         navigation={navigation}
-        userIcon={true}
+        // userIcon={true}
       />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <LinearGradient
@@ -535,7 +535,7 @@ const DashBoard = ({ navigation, route }) => {
         <PaymentModal closeModal={setShowQrCode} />
       </Modal>
       <Modal visible={showReferForm} animationType="slide">
-        <ReferForm closeModal={setShowReferForm} />
+        <ReferForm closeModal={setShowReferForm} userDetails={userDetails}/>
       </Modal>
       <Modal visible={showWithdrawModal} animationType="slide">
         <WithdrawnModal closeModal={setShowWithdrawModal} />

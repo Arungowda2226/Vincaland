@@ -22,8 +22,8 @@ const Calculator = ({ navigation }) => {
   const [loanPeriod, setLoanPeriod] = useState(5);
   const [emi, setEmi] = useState(null);
 
-  // ✅ Calculate EMI on button click
   const calculateEMI = () => {
+    
     const principal = loanAmount;
     const monthlyRate = interestRate / 12 / 100;
     const months = loanPeriod * 12;
@@ -91,7 +91,7 @@ const Calculator = ({ navigation }) => {
               step={10000}
               value={loanAmount}
               onValueChange={setLoanAmount}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -108,7 +108,7 @@ const Calculator = ({ navigation }) => {
               step={0.1}
               value={interestRate}
               onValueChange={setInterestRate}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -125,7 +125,7 @@ const Calculator = ({ navigation }) => {
               step={1}
               value={loanPeriod}
               onValueChange={setLoanPeriod}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -159,7 +159,7 @@ const Calculator = ({ navigation }) => {
               step={100}
               value={presentValue}
               onValueChange={setPresentValue}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -176,7 +176,7 @@ const Calculator = ({ navigation }) => {
               step={0.1}
               value={inflationRate}
               onValueChange={setInflationRate}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -193,7 +193,7 @@ const Calculator = ({ navigation }) => {
               step={1}
               value={inflationYears}
               onValueChange={setInflationYears}
-              minimumTrackTintColor="#FFADD3"
+              minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
             />
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   footerBox: {
     position: "absolute",
-    bottom: 50,
+    bottom: 210,
     left: 20,
     right: 20,
   },

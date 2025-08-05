@@ -11,18 +11,17 @@ import {
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSelector } from "react-redux"; // ✅ Redux for auto update
 
 const { width, height } = Dimensions.get("window");
 
-const Home = ({ navigation, route }) => {
+const Home = ({ navigation }) => {
+  const { user } = useSelector((state) => state.user); // ✅ Get user from Redux
 
-  const {loginUser} = route?.params || {};
   const [notificationCount, setNotificationCount] = useState(0);
   const [boxHeight, setBoxHeight] = useState(0);
 
-  useEffect(()=>{
-    console.log(loginUser,"ThisIsLoginUser");
-  },[])
+  const profileImage = user?.user?.profilePhoto; // ✅ Auto updates from Redux
 
   const onBoxLayout = (event) => {
     const { height } = event.nativeEvent.layout;
@@ -31,6 +30,10 @@ const Home = ({ navigation, route }) => {
 
   const receiveNotification = () => {
     setNotificationCount((prev) => prev + 1);
+  };
+
+  const handleProfile = () => {
+    navigation.openDrawer();
   };
 
   const handleLogin = () => {
@@ -73,13 +76,18 @@ const Home = ({ navigation, route }) => {
             </View>
           )}
         </TouchableOpacity>
-        <View>
+        <Pressable onPress={handleProfile}>
           <Image
-            source={require("../../../assets/profile.png")}
+            source={
+              profileImage
+                ? { uri: profileImage }
+                : require("../../../assets/profile.png")
+            }
             style={styles.profileImage}
           />
-        </View>
+        </Pressable>
       </View>
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ width: "55%" }}>
@@ -160,7 +168,8 @@ const Home = ({ navigation, route }) => {
         </LinearGradient>
 
         <View style={styles.rowContainer}>
-          <Pressable onPress={handleCalculator}
+          <Pressable
+            onPress={handleCalculator}
             style={[styles.customerBox, { height: boxHeight || "auto" }]}
             onLayout={onBoxLayout}
           >
@@ -170,17 +179,6 @@ const Home = ({ navigation, route }) => {
             />
             <Text style={styles.customerTitle}>Calculator</Text>
           </Pressable>
-
-          {/* <View
-            style={[styles.customerBox, { height: boxHeight || "auto" }]}
-            onLayout={onBoxLayout}
-          >
-            <Image
-              source={require("../../../assets/cashBack.png")}
-              style={styles.customerImage}
-            />
-            <Text style={styles.customerTitle}>Cashback</Text>
-          </View> */}
 
           <View
             style={[styles.customerBox, { height: boxHeight || "auto" }]}
@@ -211,29 +209,6 @@ const Home = ({ navigation, route }) => {
           />
         </View>
       </ScrollView>
-      {/* <View style={styles.footerContainer}>
-        <Pressable style={styles.footerContentContainer}>
-          <Image
-            source={require("../../../assets/home.png")}
-            style={styles.footerIcon}
-          />
-          <Text style={styles.footerLabel}>Home</Text>
-        </Pressable>
-        <Pressable style={styles.footerContentContainer}>
-          <Image
-            source={require("../../../assets/statementSummary.png")}
-            style={styles.footerIcon}
-          />
-          <Text style={styles.footerLabel}>History</Text>
-        </Pressable>
-        <Pressable style={styles.footerContentContainer}>
-          <Image
-            source={require("../../../assets/offers.png")}
-            style={styles.footerIcon}
-          />
-          <Text style={styles.footerLabel}>Offers</Text>
-        </Pressable>
-      </View> */}
     </View>
   );
 };
@@ -300,11 +275,11 @@ const styles = StyleSheet.create({
     width: width * 0.1,
     height: height * 0.05,
     resizeMode: "stretch",
+    borderRadius:20
   },
   scrollContainer: {
     paddingVertical: 10,
     padding: 24,
-    // paddingBottom: "200"
   },
   loanContainer: {
     flexDirection: "row",
@@ -371,7 +346,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   subScribcontainer: {
-    padding: 10,
+    // padding: 10,
+    paddingHorizontal:10,
+    paddingTop:10,
     marginVertical: 10,
     borderRadius: 13,
     marginTop: 20,

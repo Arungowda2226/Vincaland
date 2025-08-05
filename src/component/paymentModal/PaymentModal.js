@@ -20,10 +20,8 @@ const PaymentModal = ({ closeModal }) => {
   const [amountToPay, setAmountToPay] = useState(1200); // default
   const [isPaying, setIsPaying] = useState(false);
 
-  // ✅ Pre-generate QR Code Data
   const qrCodeData = `upi://pay?mc=5968&pa=yespay.smessi24427@yesbankltd&pn=VINCALAND SERVICES PRIVATE LIMITED&am=${amountToPay}`;
 
-  // ✅ Fetch token from AsyncStorage
   useEffect(() => {
     AsyncStorage.getItem("token")
       .then((storedToken) => {
@@ -40,7 +38,7 @@ const PaymentModal = ({ closeModal }) => {
   // ✅ Confirm Payment Completion
   const confirmPaymentCompletion = () => {
     setIsPaying(true);
-    fetch(`${API}/investors/paymentUpdate`, {
+    fetch(`${API}/payments/paymentUpdate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

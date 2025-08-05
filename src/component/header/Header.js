@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     backgroundColor: "#ffff",
+    marginTop:10
   },
   locationContainer: {
     padding: 10,
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontWeight: "600",
     fontSize: 18,
-    marginLeft: 15,
+    marginLeft: 8,
   },
 });
 

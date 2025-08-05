@@ -38,7 +38,9 @@ const Register = ({ onSwitchToLogin }) => {
 
   const handleAddPhone = () => {
     setShowAddPhoneModal(true);
-    fetch(`${API}/investors/sendOtp`, {
+    console.log(`${API}/otp/sendOtp`,"thisIsSendOtp");
+    
+    fetch(`${API}/otp/sendOtp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,8 +113,8 @@ const Register = ({ onSwitchToLogin }) => {
       return;
     }
 
-    console.log(`${API}/investors/verify-otp`);
-    fetch(`${API}/investors/verify-otp`, {
+    console.log(`${API}/otp/verify-otp`);
+    fetch(`${API}/otp/verify-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
