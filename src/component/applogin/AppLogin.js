@@ -30,6 +30,7 @@ const AppLogin = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const otpRefs = useRef([]);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const dispatch = useDispatch();
 
@@ -41,39 +42,39 @@ const AppLogin = ({ navigation }) => {
     setShowPass(!showPass);
   };
 
-const handleLogin = () => {
-  if (mail?.trim() && password?.trim()) {
-    const url = `${LoanApi}/auth/login`;
+  const handleLogin = () => {
+    if (mail?.trim() && password?.trim()) {
+      const url = `${LoanApi}/auth/login`;
 
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: mail,
-        password: password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data, "thisIsData");
-        dispatch(setUser(data)); 
-        navigation.replace("Main");
-        // navigation.navigate('Main', { loginUser: data });
-        // navigation.navigate('Main', { screen: 'Home', params: { loginUser: data } });
-        // navigation.navigate("Home",{loginUser: data});
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: mail,
+          password: password,
+        }),
       })
-      .catch((err) => {
-        console.log(err, "thisIsError");
-      });
-  } else {
-    Alert.alert(
-      "Missing Information",
-      "Please enter both email and password."
-    );
-  }
-};
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data, "thisIsData");
+          dispatch(setUser(data));
+          navigation.replace("Main");
+          // navigation.navigate('Main', { loginUser: data });
+          // navigation.navigate('Main', { screen: 'Home', params: { loginUser: data } });
+          // navigation.navigate("Home",{loginUser: data});
+        })
+        .catch((err) => {
+          console.log(err, "thisIsError");
+        });
+    } else {
+      Alert.alert(
+        "Missing Information",
+        "Please enter both email and password."
+      );
+    }
+  };
 
   const handleSignUp = () => {
     navigation.navigate("AppSignUp");
@@ -84,8 +85,34 @@ const handleLogin = () => {
   };
 
   const handleSubmitPhone = () => {
-    setIsShowForgotPass(false);
-    setIsShowOtp(true);
+    // setIsShowForgotPass(false);
+    // setIsShowOtp(true);
+    console.log("clicked");
+
+    if (!phoneNumber) {
+      Alert.alert("Error", "Please enter your phone number");
+      return;
+    }
+
+    fetch(`${LoanApi}/auth/sendOtp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phoneNumber }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsData");
+        if (data.message === "OTP Sent") {
+          setIsShowForgotPass(false);
+          setIsShowOtp(true);
+        } else {
+          Alert.alert("Error", data.message || "Failed to send OTP");
+        }
+      })
+      .catch((err) => {
+        console.log("Network error:", err);
+        Alert.alert("Error", "Network error");
+      });
   };
 
   const handleOtpChange = (value, index) => {
@@ -106,10 +133,59 @@ const handleLogin = () => {
     }
   };
 
+  // const handleSubmitOtp = () => {
+  //   setIsShowOtp(false);
+  //   setIsShowNewPasswordModal(true);
+  // };
+
   const handleSubmitOtp = () => {
-    setIsShowOtp(false);
-    setIsShowNewPasswordModal(true);
-  };
+  const otp = otpDigits.join("");
+  if (otp.length !== 6) {
+    Alert.alert("Error", "Please enter a valid 6-digit OTP");
+    return;
+  }
+
+  fetch(`${LoanApi}/auth/verifyOtp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone: phoneNumber, otp }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.message === "OTP verified successfully") {
+        setIsShowOtp(false);
+        setIsShowNewPasswordModal(true);
+      } else {
+        Alert.alert("Error", data.message || "Invalid OTP");
+      }
+    })
+    .catch(() => Alert.alert("Error", "Network error"));
+};
+
+const handleResetPassword = () => {
+  if (!newPassword || newPassword !== confirmPassword) {
+    Alert.alert("Error", "Passwords do not match");
+    return;
+  }
+
+  fetch(`${LoanApi}/auth/resetPassword`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone: phoneNumber, newPassword }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.message === "Password reset successful") {
+        setIsShowNewPasswordModal(false);
+        Alert.alert("Success", "Password reset successfully!");
+        setPassword(""); // optional
+      } else {
+        Alert.alert("Error", data.message || "Failed to reset password");
+      }
+    })
+    .catch(() => Alert.alert("Error", "Network error"));
+};
+
 
   return (
     <View style={styles.main}>
@@ -118,7 +194,7 @@ const handleLogin = () => {
           source={require("../../../assets/Vector.png")}
           style={styles.iconImage}
         />
-        <Text style={styles.topLabel}>Hi, Welcome back!</Text>
+        <Text style={styles.topLabel}>Hi, Welcome back!ARUN</Text>
         <Text style={styles.profileLabel}>Let's get started.</Text>
       </View>
       <View style={{ marginTop: 20 }}>
@@ -213,7 +289,13 @@ const handleLogin = () => {
             </Text>
             <View style={styles.modalInput}>
               <Image source={require("../../../assets/user.png")} />
-              <TextInput placeholder="Enter your phone number" />
+              <TextInput
+                placeholder="Enter your phone number"
+                keyboardType="phone-pad"
+                onChangeText={setPhoneNumber}
+                value={phoneNumber}
+                style={{ flex: 1 }}
+              />
             </View>
 
             <Pressable onPress={handleSubmitPhone} style={styles.modalButton}>
@@ -321,6 +403,7 @@ const handleLogin = () => {
                 // Add validation and API call logic here
                 if (newPassword && newPassword === confirmPassword) {
                   setIsShowNewPasswordModal(false);
+                  handleResetPassword()
                   alert("Password successfully reset!");
                   // Optionally navigate to login or home
                 } else {

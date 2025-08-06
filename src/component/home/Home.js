@@ -170,8 +170,8 @@ const Home = ({ navigation }) => {
         <View style={styles.rowContainer}>
           <Pressable
             onPress={handleCalculator}
-            style={[styles.customerBox, { height: boxHeight || "auto" }]}
-            onLayout={onBoxLayout}
+            style={styles.customerBox}
+           
           >
             <Image
               source={require("../../../assets/calculator.png")}
@@ -181,8 +181,7 @@ const Home = ({ navigation }) => {
           </Pressable>
 
           <View
-            style={[styles.customerBox, { height: boxHeight || "auto" }]}
-            onLayout={onBoxLayout}
+            style={styles.customerBox}
           >
             <Image
               source={require("../../../assets/customer.png")}
