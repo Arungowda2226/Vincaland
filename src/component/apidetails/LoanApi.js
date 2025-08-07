@@ -1,3 +1,3 @@
-const LoanApi = "http://192.168.0.146:3000";
+const LoanApi = "http://52.66.172.197:5070";
 
 export default LoanApi;

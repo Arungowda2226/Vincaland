@@ -22,6 +22,8 @@ const EditProfile = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobileNum, setMobileNum] = useState("");
+  const [nomineeName, setNomineeName] = useState("");
+  const [nomineePhone, setNomineePhone] = useState("");
 
   useEffect(() => {
     if (user?.user) {
@@ -121,6 +123,23 @@ const EditProfile = ({ navigation }) => {
             value={email}
             style={styles.input}
             keyboardType="email-address"
+          />
+        </View>
+        <View style={styles.boxContainer}>
+          <Text>Nominee Name (as per governament ID)</Text>
+          <TextInput
+            onChangeText={setNomineeName}
+            value={nomineeName}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.boxContainer}>
+          <Text>Nominee Phone Number</Text>
+          <TextInput
+            onChangeText={setNomineePhone}
+            value={nomineePhone}
+            style={styles.input}
+            keyboardType="phone-pad"
           />
         </View>
       </ScrollView>

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
+import Constants from "expo-constants";
 
 import AppLogin from "./src/component/applogin/AppLogin";
 import AppSignUp from "./src/component/appsingup/AppSignUp";
@@ -15,6 +16,9 @@ import Investment from "./src/component/investment/Investment";
 import Calculator from "./src/component/calculator/Calculator";
 import CustomDrawer from "./src/component/drawer/CustomDrawer";
 import EditProfile from "./src/component/profile/EditProfile";
+import Subscribe from "./src/component/subscribe/Subscribe";
+import ReferralHistory from "./src/component/refer/ReferralHistory";
+import PaymentHistory from "./src/component/paymentModal/PaymentHistory";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -29,15 +33,26 @@ function MyDrawer() {
       <Drawer.Screen name="Loan" component={Loan} />
       <Drawer.Screen name="Investment" component={Investment} />
       <Drawer.Screen name="Calculator" component={Calculator} />
+      <Drawer.Screen name="Subscribe" component={Subscribe} />
+      <Drawer.Screen name="Referral History" component={ReferralHistory} />
+      <Drawer.Screen name="Payment History" component={PaymentHistory} />
     </Drawer.Navigator>
   );
 }
 
 export default function App() {
+  useEffect(() => {
+    console.log(Constants);
+    console.log(Constants.runtimeVersion);
+  }, []);
+
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="appLogin" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          initialRouteName="appLogin"
+          screenOptions={{ headerShown: false }}
+        >
           <Stack.Screen name="appLogin" component={AppLogin} />
           <Stack.Screen name="AppSignUp" component={AppSignUp} />
           <Stack.Screen name="Main" component={MyDrawer} />

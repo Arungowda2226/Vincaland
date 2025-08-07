@@ -52,6 +52,10 @@ const Home = ({ navigation }) => {
     navigation.navigate("Calculator");
   };
 
+  const handleSubscribe = () => {
+    navigation.navigate("Subscribe");
+  };
+
   return (
     <View style={styles.main}>
       <View style={styles.header}>
@@ -62,10 +66,18 @@ const Home = ({ navigation }) => {
           />
           <Text style={styles.vincLabel}>VINCALAND</Text>
         </View>
-        <Pressable style={styles.subScri}>
-          <Text style={styles.subScriLabel}>Subscribe</Text>
-        </Pressable>
-        <TouchableOpacity
+        <View style={{flexDirection:"row", alignItems:"center"}}>
+        <LinearGradient 
+          colors={["#FFDE51", "#FF159C", "#C627F4"]} 
+          style={styles.subScri}
+          start={{ x: 0, y: 0 }} // Left
+          end={{ x: 1, y: 0 }}
+        >
+          <Pressable >
+            <Text style={styles.subScriLabel}>Subscribe</Text>
+          </Pressable>
+        </LinearGradient>
+        {/* <TouchableOpacity
           onPress={receiveNotification}
           style={styles.iconContainer}
         >
@@ -75,17 +87,18 @@ const Home = ({ navigation }) => {
               <Text style={styles.badgeText}>{notificationCount}</Text>
             </View>
           )}
-        </TouchableOpacity>
-        <Pressable onPress={handleProfile}>
+        </TouchableOpacity> */}
+        <Pressable onPress={handleProfile} style={{marginLeft:20}}>
           <Image
             source={
               profileImage
                 ? { uri: profileImage }
-                : require("../../../assets/profile.png")
+                : require("../../../assets/dummyprofile.png")
             }
             style={styles.profileImage}
           />
         </Pressable>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -136,10 +149,10 @@ const Home = ({ navigation }) => {
               <Text style={styles.unlockText}>
                 Unlock Premium Benefits Just for You!
               </Text>
-              <View style={styles.subscribeRow}>
+              <Pressable onPress={handleSubscribe} style={styles.subscribeRow}>
                 <Text style={styles.subscribeNowText}>Subscribe Now </Text>
                 <Ionicons name="arrow-forward" size={20} color={"#F62516"} />
-              </View>
+              </Pressable>
             </View>
             <Image
               source={require("../../../assets/subscribe.png")}
@@ -168,11 +181,7 @@ const Home = ({ navigation }) => {
         </LinearGradient>
 
         <View style={styles.rowContainer}>
-          <Pressable
-            onPress={handleCalculator}
-            style={styles.customerBox}
-           
-          >
+          <Pressable onPress={handleCalculator} style={styles.customerBox}>
             <Image
               source={require("../../../assets/calculator.png")}
               style={styles.customerImage}
@@ -180,9 +189,7 @@ const Home = ({ navigation }) => {
             <Text style={styles.customerTitle}>Calculator</Text>
           </Pressable>
 
-          <View
-            style={styles.customerBox}
-          >
+          <View style={styles.customerBox}>
             <Image
               source={require("../../../assets/customer.png")}
               style={styles.customerCareImage}
@@ -240,7 +247,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   subScri: {
-    backgroundColor: "#FF7700",
     borderRadius: 13,
     paddingHorizontal: 20,
     paddingVertical: 7,
@@ -271,10 +277,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   profileImage: {
-    width: width * 0.1,
+    width: width * 0.13,
     height: height * 0.05,
     resizeMode: "stretch",
-    borderRadius:20
+    borderRadius: 20,
   },
   scrollContainer: {
     paddingVertical: 10,
@@ -283,7 +289,7 @@ const styles = StyleSheet.create({
   loanContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4A50F6",
+    backgroundColor: "#31E100",
     borderRadius: 13,
     alignSelf: "flex-start",
     justifyContent: "space-between",
@@ -304,7 +310,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   dashBoardContainer: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#CB2DFB",
     borderBottomLeftRadius: 30,
     borderRadius: 10,
     alignSelf: "flex-start",
@@ -324,6 +330,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     marginLeft: 20,
+    color:"#FFFFFF"
   },
   investmentImage: {
     height: height * 0.15,
@@ -332,7 +339,7 @@ const styles = StyleSheet.create({
   },
   investmentContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#006DD0",
     marginLeft: 10,
     padding: 10,
     borderRadius: 13,
@@ -343,11 +350,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     marginTop: 10,
+    color:"#FFFFFF"
   },
   subScribcontainer: {
     // padding: 10,
-    paddingHorizontal:10,
-    paddingTop:10,
+    paddingHorizontal: 10,
+    paddingTop: 10,
     marginVertical: 10,
     borderRadius: 13,
     marginTop: 20,

@@ -43,6 +43,8 @@ const AppLogin = ({ navigation }) => {
   };
 
   const handleLogin = () => {
+    console.log("clicking");
+    
     if (mail?.trim() && password?.trim()) {
       const url = `${LoanApi}/auth/login`;
 
@@ -59,6 +61,10 @@ const AppLogin = ({ navigation }) => {
         .then((res) => res.json())
         .then((data) => {
           console.log(data, "thisIsData");
+          if (data?.message === "User not found" || data?.error) {
+            Alert.alert("Login Failed", data?.message || "Invalid credentials");
+            return; // prevent navigating
+          }
           dispatch(setUser(data));
           navigation.replace("Main");
           // navigation.navigate('Main', { loginUser: data });
@@ -139,53 +145,52 @@ const AppLogin = ({ navigation }) => {
   // };
 
   const handleSubmitOtp = () => {
-  const otp = otpDigits.join("");
-  if (otp.length !== 6) {
-    Alert.alert("Error", "Please enter a valid 6-digit OTP");
-    return;
-  }
+    const otp = otpDigits.join("");
+    if (otp.length !== 6) {
+      Alert.alert("Error", "Please enter a valid 6-digit OTP");
+      return;
+    }
 
-  fetch(`${LoanApi}/auth/verifyOtp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone: phoneNumber, otp }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.message === "OTP verified successfully") {
-        setIsShowOtp(false);
-        setIsShowNewPasswordModal(true);
-      } else {
-        Alert.alert("Error", data.message || "Invalid OTP");
-      }
+    fetch(`${LoanApi}/auth/verifyOtp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phoneNumber, otp }),
     })
-    .catch(() => Alert.alert("Error", "Network error"));
-};
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === "OTP verified successfully") {
+          setIsShowOtp(false);
+          setIsShowNewPasswordModal(true);
+        } else {
+          Alert.alert("Error", data.message || "Invalid OTP");
+        }
+      })
+      .catch(() => Alert.alert("Error", "Network error"));
+  };
 
-const handleResetPassword = () => {
-  if (!newPassword || newPassword !== confirmPassword) {
-    Alert.alert("Error", "Passwords do not match");
-    return;
-  }
+  const handleResetPassword = () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
 
-  fetch(`${LoanApi}/auth/resetPassword`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone: phoneNumber, newPassword }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.message === "Password reset successful") {
-        setIsShowNewPasswordModal(false);
-        Alert.alert("Success", "Password reset successfully!");
-        setPassword(""); // optional
-      } else {
-        Alert.alert("Error", data.message || "Failed to reset password");
-      }
+    fetch(`${LoanApi}/auth/resetPassword`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phoneNumber, newPassword }),
     })
-    .catch(() => Alert.alert("Error", "Network error"));
-};
-
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === "Password reset successful") {
+          setIsShowNewPasswordModal(false);
+          Alert.alert("Success", "Password reset successfully!");
+          setPassword(""); // optional
+        } else {
+          Alert.alert("Error", data.message || "Failed to reset password");
+        }
+      })
+      .catch(() => Alert.alert("Error", "Network error"));
+  };
 
   return (
     <View style={styles.main}>
@@ -194,7 +199,7 @@ const handleResetPassword = () => {
           source={require("../../../assets/Vector.png")}
           style={styles.iconImage}
         />
-        <Text style={styles.topLabel}>Hi, Welcome back!ARUN</Text>
+        <Text style={styles.topLabel}>Hi, Welcome back!</Text>
         <Text style={styles.profileLabel}>Let's get started.</Text>
       </View>
       <View style={{ marginTop: 20 }}>
@@ -403,7 +408,7 @@ const handleResetPassword = () => {
                 // Add validation and API call logic here
                 if (newPassword && newPassword === confirmPassword) {
                   setIsShowNewPasswordModal(false);
-                  handleResetPassword()
+                  handleResetPassword();
                   alert("Password successfully reset!");
                   // Optionally navigate to login or home
                 } else {

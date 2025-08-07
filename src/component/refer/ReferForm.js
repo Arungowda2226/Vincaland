@@ -10,25 +10,57 @@ const ReferForm = ({ closeModal, userDetails }) => {
   const [message, setMessage] = useState("");
  
   const handleSubmit = () => {
-    const bodyData = {
-      name: name,
-      mobileNumber: number,
-      email: email,
-      message: message,
-      refByPhoneNumber: userDetails.phoneNumber,
-    };
+  if (!name.trim()) {
+    Alert.alert("Validation Error", "Name is required.");
+    return;
+  } else if (name.trim().length < 3) {
+    Alert.alert("Validation Error", "Name must be at least 3 characters.");
+    return;
+  }
+  const mobileRegex = /^[6-9]\d{9}$/;
+  if (!number.trim()) {
+    Alert.alert("Validation Error", "Mobile number is required.");
+    return;
+  } else if (!mobileRegex.test(number.trim())) {
+    Alert.alert("Validation Error", "Enter a valid 10-digit mobile number.");
+    return;
+  }
 
-    fetch(`${API}/referral`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(bodyData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data, "thisIsReferResponse");
-        if (data?.success) {
+  // Email validation (only if provided)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email.trim() && !emailRegex.test(email.trim())) {
+    Alert.alert("Validation Error", "Enter a valid email address.");
+    return;
+  }
+
+  // Message validation
+  if (!message.trim()) {
+    Alert.alert("Validation Error", "Message is required.");
+    return;
+  } else if (message.trim().length < 10) {
+    Alert.alert("Validation Error", "Message must be at least 10 characters.");
+    return;
+  }
+
+  const bodyData = {
+    name: name.trim(),
+    mobileNumber: number.trim(),
+    email: email.trim(),
+    message: message.trim(),
+    refByPhoneNumber: userDetails.phoneNumber,
+  };
+
+  fetch(`${API}/referral`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data, "thisIsReferResponse");
+      if (data?.success) {
         Alert.alert("Success", "Referral submitted successfully!", [
           { text: "OK", onPress: () => closeModal(false) },
         ]);
@@ -38,11 +70,12 @@ const ReferForm = ({ closeModal, userDetails }) => {
           data?.message || "Something went wrong. Please try again."
         );
       }
-      })
-      .catch((err) => {
-        console.log(err, "thisIsError");
-      });
-  };
+    })
+    .catch((err) => {
+      console.log(err, "thisIsError");
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    });
+};
 
   return (
     <View style={{ flex: 1 }}>
@@ -62,7 +95,7 @@ const ReferForm = ({ closeModal, userDetails }) => {
           onChangeText={setNumber}
         />
         <TextInput
-          placeholder="Enter Email address"
+          placeholder="Enter Email address (optional)"
           style={styles.input}
           keyboardType="email-address"
           value={email}

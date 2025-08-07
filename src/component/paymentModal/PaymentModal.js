@@ -14,9 +14,10 @@ import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API from "../apidetails/Api";
 
-const PaymentModal = ({ closeModal }) => {
+const PaymentModal = ({ closeModal, onPaymentSuccess }) => {
   const [token, setToken] = useState(null);
   const [utrNumber, setUtrNumber] = useState("");
+  const [utrError, setUtrError] = useState("");
   const [amountToPay, setAmountToPay] = useState(1200); // default
   const [isPaying, setIsPaying] = useState(false);
 
@@ -35,9 +36,23 @@ const PaymentModal = ({ closeModal }) => {
       .catch((error) => console.error("Error reading token:", error));
   }, []);
 
+  // ✅ UTR Validation Function
+  const validateUTR = (utr) => {
+    const utrPattern = /^[a-zA-Z0-9]{12}$/; // alphanumeric, 10–20 chars
+    return utrPattern.test(utr);
+  };
+
   // ✅ Confirm Payment Completion
   const confirmPaymentCompletion = () => {
+    // Frontend validation for UTR
+    if (!validateUTR(utrNumber)) {
+      setUtrError("Invalid UTR. Must be 12 characters.");
+      return;
+    }
+
+    setUtrError(""); // clear previous error
     setIsPaying(true);
+
     fetch(`${API}/payments/paymentUpdate`, {
       method: "POST",
       headers: {
@@ -55,7 +70,15 @@ const PaymentModal = ({ closeModal }) => {
         Alert.alert(
           "Payment Submitted",
           "Your payment is done. Amount will be credited to your wallet within 30 minutes. If not credited, please contact our support team.",
-          [{ text: "OK", onPress: () => closeModal(false) }]
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                if (onPaymentSuccess) onPaymentSuccess();
+                closeModal(false);
+              },
+            },
+          ]
         );
       })
       .catch((err) => {
@@ -94,15 +117,20 @@ const PaymentModal = ({ closeModal }) => {
 
         {/* UTR Input and Submit */}
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: utrError ? "red" : "#ccc" }]}
           placeholder="Enter UTR Number"
           value={utrNumber}
           onChangeText={setUtrNumber}
-          keyboardType="numeric"
+          keyboardType="number-pad"
         />
 
+        {utrError ? <Text style={styles.utrError}>{utrError}</Text> : null}
+
         <Pressable
-          style={styles.submitBtn}
+          style={[
+            styles.submitBtn,
+            { opacity: isPaying || utrNumber.trim() === "" ? 0.6 : 1 },
+          ]}
           onPress={confirmPaymentCompletion}
           disabled={isPaying || utrNumber.trim() === ""}
         >
@@ -125,20 +153,25 @@ const styles = StyleSheet.create({
   qrContainer: { marginVertical: 30, alignItems: "center" },
   noteText: {
     marginTop: 15,
-    // textAlign: "center",
     color: "#555",
     fontSize: 14,
     paddingHorizontal: 20,
-    fontWeight:"800"
+    fontWeight: "800",
   },
   input: {
     marginHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 10,
     padding: 12,
     marginVertical: 15,
     fontSize: 16,
+  },
+  utrError: {
+    color: "red",
+    marginLeft: 12,
+    marginTop: -10,
+    marginBottom: 10,
+    fontSize: 13,
   },
   submitBtn: {
     backgroundColor: "#3DC426",

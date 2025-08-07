@@ -17,14 +17,12 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.sanketh99.vincaland"

@@ -230,11 +230,11 @@ const DashBoard = ({ navigation, route }) => {
 
   const handleShowReferForm = () => {
     setShowReferForm(true);
-  }
+  };
 
   const handleWithdraw = () => {
     setShowWithdrawModal(true);
-  }
+  };
 
   return (
     <View style={styles.main}>
@@ -298,14 +298,16 @@ const DashBoard = ({ navigation, route }) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor:"#FCC92F",
-            borderRadius:13,
-            marginVertical:10
+            backgroundColor: "#FCC92F",
+            borderRadius: 13,
+            marginVertical: 10,
           }}
         >
-          <View style={{flexDirection:"row", alignItems:"center"}}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons name="chatbubble-ellipses-outline" size={30} />
-            <Text style={{marginLeft:10, fontWeight:"600", fontSize:14}}>Message & Refer</Text>
+            <Text style={{ marginLeft: 10, fontWeight: "600", fontSize: 14 }}>
+              Message & Refer
+            </Text>
           </View>
           <Ionicons name="chevron-forward-outline" size={30} />
         </Pressable>
@@ -532,10 +534,16 @@ const DashBoard = ({ navigation, route }) => {
         </View>
       </ScrollView>
       <Modal visible={showQrCode}>
-        <PaymentModal closeModal={setShowQrCode} />
+        <PaymentModal
+          closeModal={setShowQrCode}
+          onPaymentSuccess={() => {
+            getDashBoardDetails();
+            paymentDetails();
+          }}
+        />
       </Modal>
       <Modal visible={showReferForm} animationType="slide">
-        <ReferForm closeModal={setShowReferForm} userDetails={userDetails}/>
+        <ReferForm closeModal={setShowReferForm} userDetails={userDetails} />
       </Modal>
       <Modal visible={showWithdrawModal} animationType="slide">
         <WithdrawnModal closeModal={setShowWithdrawModal} />

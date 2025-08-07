@@ -25,7 +25,7 @@ export default function CustomDrawer(props) {
       <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
         <View style={styles.header}>
           <Image
-            source={profile ? { uri: profile } : require("../../../assets/profile.png")}
+            source={profile ? { uri: profile } : require("../../../assets/dummyprofile.png")}
             style={styles.profileImage}
           />
           <Text style={styles.userName}>{user?.user?.fullName || "Guest User"}</Text>
