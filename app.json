@@ -2,7 +2,7 @@
   "expo": {
     "name": "vincaland",
     "slug": "vincaland",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -23,6 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
+        "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.sanketh99.vincaland"
@@ -35,6 +36,14 @@
     },
     "plugins": [
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
@@ -43,11 +52,11 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "591a0598-0be5-4521-8e58-ed9056fc7200"
+        "projectId": "b7a771ce-5ca6-4274-afec-44ac12a7c5e6"
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/591a0598-0be5-4521-8e58-ed9056fc7200"
+      "url": "https://u.expo.dev/b7a771ce-5ca6-4274-afec-44ac12a7c5e6"
     }
   }
 }

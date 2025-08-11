@@ -42,45 +42,55 @@ const AppLogin = ({ navigation }) => {
     setShowPass(!showPass);
   };
 
-  const handleLogin = () => {
-    console.log("clicking");
-    
-    if (mail?.trim() && password?.trim()) {
-      const url = `${LoanApi}/auth/login`;
+const handleLogin = () => {
+  console.log("clicking");
 
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: mail,
-          password: password,
-        }),
+  if (mail?.trim() && password?.trim()) {
+    const url = `${LoanApi}/auth/login`;
+    alert(url)
+    console.log(url, "thisIshittingURL");
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: mail,
+        password: password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsData");
+
+        if (!data || data?.message === "User not found" || data?.error) {
+          Alert.alert(
+            "Login Failed",
+            data?.message || data?.error || "Invalid credentials"
+          );
+          return; // stop here
+        }
+
+        dispatch(setUser(data));
+        navigation.replace("Main");
       })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data, "thisIsData");
-          if (data?.message === "User not found" || data?.error) {
-            Alert.alert("Login Failed", data?.message || "Invalid credentials");
-            return; // prevent navigating
-          }
-          dispatch(setUser(data));
-          navigation.replace("Main");
-          // navigation.navigate('Main', { loginUser: data });
-          // navigation.navigate('Main', { screen: 'Home', params: { loginUser: data } });
-          // navigation.navigate("Home",{loginUser: data});
-        })
-        .catch((err) => {
-          console.log(err, "thisIsError");
-        });
-    } else {
-      Alert.alert(
-        "Missing Information",
-        "Please enter both email and password."
-      );
-    }
-  };
+      .catch((err) => {
+        console.log(err, "thisIsError");
+        Alert.alert(
+          "Network Error",
+          "Something went wrong while logging in. Please try again."
+        );
+      });
+
+  } else {
+    Alert.alert(
+      "Missing Information",
+      "Please enter both email and password."
+    );
+  }
+};
+
 
   const handleSignUp = () => {
     navigation.navigate("AppSignUp");

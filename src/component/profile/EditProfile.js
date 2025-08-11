@@ -55,6 +55,8 @@ const EditProfile = ({ navigation }) => {
       formData.append("fullName", name);
       formData.append("phone", mobileNum);
       formData.append("email", email);
+      formData.append("nomineeName", nomineeName);
+      formData.append("nomineePhone", nomineePhone);
 
       // ✅ Only attach image if it's a new local file
       if (image && image.startsWith("file://")) {
