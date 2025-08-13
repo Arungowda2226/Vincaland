@@ -29,6 +29,7 @@ const Register = ({ onSwitchToLogin }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   const otpRefs = useRef([]);
 
@@ -38,8 +39,8 @@ const Register = ({ onSwitchToLogin }) => {
 
   const handleAddPhone = () => {
     setShowAddPhoneModal(true);
-    console.log(`${API}/otp/sendOtp`,"thisIsSendOtp");
-    
+    console.log(`${API}/otp/sendOtp`, "thisIsSendOtp");
+
     fetch(`${API}/otp/sendOtp`, {
       method: "POST",
       headers: {
@@ -77,31 +78,54 @@ const Register = ({ onSwitchToLogin }) => {
   };
 
   const handleSignIn = () => {
-    if (!name || !email || !phone || !password || !confirmPassword) {
-      Alert.alert("Missing Fields", "Please fill in all fields");
-      return;
+    const showAlert = (title, message) => Alert.alert(title, message);
+
+    // Trim values to avoid accidental spaces
+    const trimmedName = name?.trim();
+    const trimmedEmail = email?.trim();
+    const trimmedPhone = phone?.trim();
+    const trimmedPassword = password?.trim();
+    const trimmedConfirmPassword = confirmPassword?.trim();
+
+    // Validation checks
+
+    if (
+      !trimmedName ||
+      !trimmedEmail ||
+      !trimmedPhone ||
+      !trimmedPassword ||
+      !trimmedConfirmPassword
+    ) {
+      return showAlert("Missing Fields", "Please fill in all fields");
     }
 
-    if (password !== confirmPassword) {
-      Alert.alert("Password Mismatch", "Passwords do not match");
-      return;
+    if (trimmedPassword !== trimmedConfirmPassword) {
+      return showAlert("Password Mismatch", "Passwords do not match");
     }
 
+    if (!isChecked) {
+      return showAlert(
+        "Terms & Conditions Required",
+        "Please read and accept the Terms & Conditions before proceeding."
+      );
+    }
+
+    // API request
     axios
       .post(`${API}/investors/register`, {
-        name,
-        emailId: email,
-        password,
-        phoneNumber: phone,
+        name: trimmedName,
+        emailId: trimmedEmail,
+        password: trimmedPassword,
+        phoneNumber: trimmedPhone,
       })
       .then((res) => {
         console.log("User registered:", res.data);
-        Alert.alert("Success", "Account created successfully");
-        navigation.navigate("DashBoard", { userDetails: res.data.investor });
+        showAlert("Success", "Account created successfully");
+        navigation.navigate("Home", { userDetails: res.data.investor });
       })
       .catch((err) => {
         console.error("Registration error:", err);
-        Alert.alert("Error", "Failed to create account");
+        showAlert("Error", "Failed to create account");
       });
   };
 
@@ -146,7 +170,15 @@ const Register = ({ onSwitchToLogin }) => {
 
   const handleSignUp = () => {
     onSwitchToLogin();
-  }
+  };
+
+  const handleShowTermsCondition = () => {
+    setShowTerms(true);
+  };
+
+  const handleCloseTermsModal = () => {
+    setShowTerms(false);
+  };
 
   return (
     <View style={styles.main}>
@@ -179,7 +211,7 @@ const Register = ({ onSwitchToLogin }) => {
           }}
         >
           <TextInput
-            placeholder="Verify your phone number"
+            placeholder="Verify phone number"
             style={[styles.input, { width: "60%" }]}
             value={phone}
             onChangeText={setPhone}
@@ -221,10 +253,12 @@ const Register = ({ onSwitchToLogin }) => {
           value={isChecked}
           onValueChange={setChecked}
         />
-        <Text style={styles.checkLabel}>
-          I agree to the{" "}
-          <Text style={styles.termsLabel}>Terms and Conditions</Text>
-        </Text>
+        <Pressable onPress={handleShowTermsCondition}>
+          <Text style={styles.checkLabel}>
+            I agree to the{" "}
+            <Text style={styles.termsLabel}>Terms & Conditions</Text>
+          </Text>
+        </Pressable>
       </View>
       <Pressable onPress={handleSignIn} style={styles.createBtn}>
         <Text style={styles.createBtnLabel}>Create Account</Text>
@@ -232,7 +266,7 @@ const Register = ({ onSwitchToLogin }) => {
       <Pressable onPress={handleSignUp} style={styles.loginType}>
         <Text style={styles.dontAc}>
           Already have an Account?
-            <Text style={styles.withOtp}>Sign in</Text>
+          <Text style={styles.withOtp}> Sign in</Text>
         </Text>
       </Pressable>
       <Modal
@@ -276,6 +310,74 @@ const Register = ({ onSwitchToLogin }) => {
           </View>
         </View>
       </Modal>
+
+      <Modal visible={showTerms} transparent={true} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalTermsContent}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ fontWeight: "500", fontSize: 14, color: "#000000" }}
+              >
+                Terms and Conditions
+              </Text>
+              <Ionicons
+                name="close-outline"
+                onPress={handleCloseTermsModal}
+                size={24}
+              />
+            </View>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#C7C7C7",
+                marginVertical: 10,
+              }}
+            />
+            <Text
+              style={{
+                fontWeight: "400",
+                fontSize: 12,
+                color: "#000000",
+                marginBottom: 5,
+              }}
+            >
+              Vincaland Premium Membership – Terms and Conditions
+            </Text>
+            <Text style={styles.label}>
+              1. Membership Duration & Cancellation
+            </Text>
+            <Text style={styles.subLabel}>
+              The premium membership is valid for 36 months (3
+              years).Cancellation and service access requests will be accepted
+              only upon completion of the full 3-year term, i.e., in the 36th
+              month of the subscription.
+            </Text>
+            <Text style={styles.label}>2. Payment Schedule</Text>
+            <Text style={styles.subLabel}>
+              Monthly subscription payments must be made between the 1st and 5th
+              of each month.
+            </Text>
+            <Text style={styles.label}>3. Missed Payments</Text>
+            <Text style={styles.subLabel}>
+              If you miss a monthly subscription payment, your membership will
+              be suspended.  The membership may be reinstated by paying all
+              pending dues in full.
+            </Text>
+            <Text style={styles.label}>4. Consistent Non-Payment</Text>
+            <Text style={styles.subLabel}>
+              If subscription payments are missed for 3 consecutive months, the
+              membership will be terminated permanently. In such cases, prior
+              payments will not be eligible for refunds.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -290,29 +392,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "600",
     fontSize: 18,
-    color: "#5D17EB",
+    color: "#2415C7",
+    marginTop: 10,
   },
   inputContainer: {
     marginVertical: 10,
   },
   input: {
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#5D17EB",
     backgroundColor: "#F6F6F6",
     marginTop: 4,
     borderRadius: 13,
   },
-  phoneBtn: {
-    padding: 15,
-    backgroundColor: "#5D17EB",
-    borderRadius: 13,
-    marginLeft: 2,
-  },
   inputIcon: {
     marginVertical: 10,
-    borderWidth: 1,
-    borderColor: "#5D17EB",
     borderRadius: 12,
     paddingHorizontal: 10,
     backgroundColor: "#F6F6F6",
@@ -321,12 +414,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   checkbox: {
-    color: "blue",
+    color: "#2415C7",
   },
   termsLabel: {
     fontWeight: "600",
     fontSize: 15,
-    color: "blue",
+    color: "#2415C7",
   },
   checkBoxContainer: {
     marginVertical: 10,
@@ -340,7 +433,7 @@ const styles = StyleSheet.create({
   createBtn: {
     padding: 15,
     borderRadius: 13,
-    backgroundColor: "#5D17EB",
+    backgroundColor: "#2415C7",
     marginVertical: 10,
     alignItems: "center",
   },
@@ -363,13 +456,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
+  modalTermsContent: {
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderRadius: 10,
+    // minWidth: "70%",
+    elevation: 5,
+  },
   modalText: {
     fontSize: 16,
     marginVertical: 4,
   },
   modalButton: {
     marginTop: 20,
-    backgroundColor: "#0516D3",
+    backgroundColor: "#2415C7",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -410,12 +510,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
     textDecorationLine: "underline",
-    color: "blue",
+    color: "#2415C7",
+    marginRight: 10,
   },
   dontAc: {
     fontWeight: "600",
     fontSize: 14,
-    color: "blue",
   },
   typeBtn: {
     marginVertical: 10,
@@ -425,13 +525,22 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "39.61deg" }],
   },
   phoneBtn: {
-    padding: 15,
-    backgroundColor: "#5D17EB",
+    padding: 10,
+    backgroundColor: "#2415C7",
     borderRadius: 13,
     marginLeft: 2,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 40,
-    minHeight: 40,
+  },
+  label: {
+    fontWeight: "500",
+    fontSize: 12,
+    color: "#000000",
+  },
+  subLabel: {
+    fontWeight: "500",
+    fontSize: 12,
+    color: "#000000",
+    marginVertical: 10,
   },
 });

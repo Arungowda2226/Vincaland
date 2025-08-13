@@ -20,6 +20,8 @@ import PaymentModal from "../paymentModal/PaymentModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReferForm from "../refer/ReferForm";
 import WithdrawnModal from "../withdrawn/WithdrawnModal";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 
 const { width, height } = Dimensions.get("window");
 
@@ -236,6 +238,10 @@ const DashBoard = ({ navigation, route }) => {
     setShowWithdrawModal(true);
   };
 
+  const generateReceipt = async (item) => {
+    navigation.navigate("PaymentReceipt",{data:item, chartData, dashBoardDetails})
+  };
+
   return (
     <View style={styles.main}>
       <Header
@@ -252,11 +258,11 @@ const DashBoard = ({ navigation, route }) => {
         >
           <View>
             <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
-            <Text style={styles.withdrawBtnLabel}>
+            <Text style={styles.totalAmount}>
               ₹
               {dashBoardDetails.investedAmount + dashBoardDetails.returnsAmount}
             </Text>
-            <Text style={styles.withdrawBtnLabel}>
+            <Text style={styles.readLabel}>
               Ready to withdraw anytime
             </Text>
           </View>
@@ -287,7 +293,7 @@ const DashBoard = ({ navigation, route }) => {
               <Text style={styles.secNumLabel}>
                 ₹{dashBoardDetails.investedAmount}
               </Text>
-              <Text style={styles.secInfoLabel}>₹2200 per month (average)</Text>
+              <Text style={styles.secInfoLabel}>₹1200 per month (average)</Text>
             </View>
           </View>
         </View>
@@ -322,11 +328,11 @@ const DashBoard = ({ navigation, route }) => {
         >
           <View style={styles.overViewContainer}>
             <View style={{ width: width * 0.4 }}>
-              <Text>Subscription Overview</Text>
+              <Text style={{fontWeight:"600", fontSize:16}}>Subscription Overview</Text>
               <Text>Your Money growth and returns over time</Text>
             </View>
             <Pressable style={styles.nanReturnBtn}>
-              <Image source={require("../../../assets/Arrow.png")} />
+              <Image source={require("../../../assets/Arrow.png")} style={{width: width*0.08, height:height*0.03, resizeMode:"stretch"}}/>
               <Text style={styles.nanReturnLabel}>
                 {" "}
                 + {((currentReturns / currentInvested) * 100).toFixed(0)}%
@@ -355,43 +361,21 @@ const DashBoard = ({ navigation, route }) => {
             </Pressable>
           </View>
           {isTable ? (
-            <View>
+            <View style={{width:"100%"}}>
               <View style={styles.tableViewBox}>
-                <Text style={[styles.tableLabel, { width: width * 0.1 }]}>
-                  MONTH
-                </Text>
-                <Text style={[styles.tableLabel, { width: width * 0.2 }]}>
-                  SUBSCRIPTION
-                </Text>
-                <Text style={[styles.tableLabel, { width: width * 0.2 }]}>
-                  PREMIUM SERVICES PROVIDED
-                </Text>
-                <Text style={[styles.tableLabel, { width: width * 0.2 }]}>
-                  EXPECTED REFUND
-                </Text>
+                <Text style={[styles.tableLabel,{width:"13%"}]}>MONTH</Text>
+                <Text style={[styles.tableLabel,{width:"18%"}]}>SUBSCRIPTION</Text>
+                <Text style={[styles.tableLabel,{width:"25%"}]}>PREMIUM SERVICES PROVIDED</Text>
+                <Text style={[styles.tableLabel,{width:"15%"}]}>EXPECTED REFUND</Text>
+                <Text style={[styles.tableLabel,{width:"12%"}]}>RECEIPT</Text>
               </View>
               {chartData.map((item, indx) => (
                 <View style={styles.dataListContainer} key={indx}>
-                  <Text style={[styles.tableLabel, { width: width * 0.17 }]}>
-                    {/* July 2025 */}
-                    {item.month}
-                  </Text>
-                  <Text style={[styles.tableLabel, { width: width * 0.2 }]}>
-                    {/* ₹1200 */}
-                    {item.invested}
-                  </Text>
-                  <Text style={[styles.tableLabel, { width: width * 0.2 }]}>
-                    ₹2000
-                  </Text>
-                  <Text
-                    style={[
-                      styles.tableLabel,
-                      { width: width * 0.2, color: "green" },
-                    ]}
-                  >
-                    ₹3000
-                    {/* {item.returns} */}
-                  </Text>
+                  <Text style={[styles.tableLabel,{width:"13%"}]}>{item.month}</Text>
+                  <Text style={[styles.tableLabel,{width:"18%"}]}>{item.invested}</Text>
+                  <Text style={[styles.tableLabel,{width:"25%"}]}>₹2000</Text>
+                  <Text style={[styles.tableLabel,{width:"15%"}]}>₹3000{/* {item.returns} */}</Text>
+                  <Ionicons onPress={() => generateReceipt(item)} name="download-outline" size={24} color={"#33A800"} style={{width:"12%"}}/>
                 </View>
               ))}
             </View>
@@ -447,15 +431,15 @@ const DashBoard = ({ navigation, route }) => {
           />
           <View style={styles.extraDetails}>
             <View style={styles.subExtraDetails}>
-              <Text style={styles.tableLabel}>Montly Membership Fee</Text>
+              <Text style={styles.tableSubLabel}>Monthly Membership Fee</Text>
               <Text style={styles.tableLabel}>₹1200</Text>
             </View>
             <View style={styles.subExtraDetails}>
-              <Text style={styles.tableLabel}>Current Monthly Refunds</Text>
+              <Text style={styles.tableSubLabel}>Current Monthly Refunds</Text>
               <Text style={[styles.tableLabel, { color: "green" }]}>₹3000</Text>
             </View>
             <View style={styles.subExtraDetails}>
-              <Text style={styles.tableLabel}>Net Value</Text>
+              <Text style={styles.tableSubLabel}>Net Value</Text>
               <Text style={styles.tableLabel}>
                 ₹
                 {dashBoardDetails.investedAmount +
@@ -490,7 +474,7 @@ const DashBoard = ({ navigation, route }) => {
                 borderRadius: 13,
               }}
             />
-            <View style={{ width: width * 0.4 }}>
+            <View style={{ width: width*0.35 }}>
               <Text style={styles.subLabel}>Next Payment Due</Text>
               <Text style={styles.nextPayLabel}>
                 Your upcoming Subscription Payment
@@ -574,7 +558,7 @@ const styles = StyleSheet.create({
   },
   firstContainer: {
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingVertical: 10,
     borderRadius: 13,
     backgroundColor: "#5D17EB",
     flexDirection: "row",
@@ -594,6 +578,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "white",
     marginLeft: 5,
+  },
+  totalAmount:{
+    fontWeight: "600",
+    fontSize: 25,
+    color: "white",
+    marginLeft: 5,
+  },
+  readLabel:{
+    fontWeight: "500",
+    fontSize: 12,
+    color: "white",
+    marginLeft: 10,
   },
   secContainer: {
     paddingHorizontal: 15,
@@ -663,11 +659,12 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     flexDirection: "row",
     alignItems: "center",
+    width: width*0.4
   },
   nanReturnLabel: {
     fontWeight: "600",
     fontSize: 14,
-    color: "#5D17EB",
+    color: "#2415C7",
   },
   viewContainer: {
     padding: 3,
@@ -690,7 +687,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   tableViewBox: {
-    padding: 10,
+    paddingVertical: 10,
     backgroundColor: themeColor.BORDER_CLR,
     flexDirection: "row",
     alignItems: "center",
@@ -699,9 +696,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "gray",
   },
   tableLabel: {
-    fontWeight: "600",
-    fontSize: 10,
+    fontWeight: "500",
+    fontSize: 8,
     flexWrap: "wrap",
+    color: "#505050",
+    textAlign: "center",
   },
   head: {
     height: 40,
@@ -722,7 +721,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   subExtraDetails: {
-    width: width * 0.25,
+    // width: width * 0.25,
   },
   subLabel: {
     fontWeight: "700",
@@ -748,11 +747,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   payNowBtn: {
-    padding: 10,
+    paddingVertical: 5,
     backgroundColor: "#3DC426",
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 13,
+    paddingHorizontal:10
   },
   paymentContainer: {
     marginVertical: 10,
@@ -776,4 +776,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#B5FFA8",
     borderRadius: 13,
   },
+  tableSubLabel:{
+    fontWeight:"600",
+    fontSize:10
+  }
 });

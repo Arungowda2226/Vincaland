@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
 import API from "../apidetails/Api";
 
-const ReferForm = ({ closeModal, userDetails }) => {
+const ReferForm = ({ closeModal, userDetails, route }) => {
+  const {navigation} = route?.params || {};
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -79,7 +80,7 @@ const ReferForm = ({ closeModal, userDetails }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header title={"Refer & Earn"} closeModal={closeModal} />
+      <Header title={"Refer & Earn"} closeModal={closeModal} navigation={navigation}/>
       <View style={{ flex: 1, padding: 24 }}>
         <TextInput
           placeholder="Enter Name"
@@ -139,7 +140,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 13,
     marginVertical: 10,
-    borderWidth: 1,
     borderColor: "#00000078",
   },
   textArea: {

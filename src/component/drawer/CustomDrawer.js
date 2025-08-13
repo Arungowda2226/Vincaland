@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,9 +9,14 @@ export default function CustomDrawer(props) {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  useEffect(()=>{
+    console.log(user,"thisIsUsers");
+  },[])
+
   const handleLogout = () => {
     dispatch(clearUser());
-    props.navigation.replace("appLogin");
+    // props.navigation.replace("Login");
+    props.navigation.navigate("Login");
   };
 
   const handleEditProfile = () => {
@@ -28,8 +33,8 @@ export default function CustomDrawer(props) {
             source={profile ? { uri: profile } : require("../../../assets/dummyprofile.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{user?.user?.fullName || "Guest User"}</Text>
-          <Text style={styles.userEmail}>{user?.user?.email || "guest@example.com"}</Text>
+          <Text style={styles.userName}>{user?.name || "Guest User"}</Text>
+          <Text style={styles.userEmail}>{user?.emailId || "guest@example.com"}</Text>
           <TouchableOpacity style={styles.editIcon} onPress={handleEditProfile}>
             <Ionicons name="create-outline" size={22} color="#5D17EB" />
           </TouchableOpacity>

@@ -4,8 +4,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
-import Constants from "expo-constants";
-
 import AppLogin from "./src/component/applogin/AppLogin";
 import AppSignUp from "./src/component/appsingup/AppSignUp";
 import Home from "./src/component/home/Home";
@@ -19,6 +17,9 @@ import EditProfile from "./src/component/profile/EditProfile";
 import Subscribe from "./src/component/subscribe/Subscribe";
 import ReferralHistory from "./src/component/refer/ReferralHistory";
 import PaymentHistory from "./src/component/paymentModal/PaymentHistory";
+import CustomerService from "./src/component/customercare/CustomerService";
+import ReferForm from "./src/component/refer/ReferForm";
+import PaymentReceipt from "./src/component/paymentModal/PaymentReceipt";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -41,16 +42,11 @@ function MyDrawer() {
 }
 
 export default function App() {
-  useEffect(() => {
-    console.log(Constants);
-    console.log(Constants.runtimeVersion);
-  }, []);
-
   return (
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="appLogin"
+          initialRouteName="Login"
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="appLogin" component={AppLogin} />
@@ -59,6 +55,9 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="DashBoard" component={DashBoard} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="CustomerService" component={CustomerService} />
+          <Stack.Screen name="ReferForm" component={ReferForm} />
+          <Stack.Screen name="PaymentReceipt" component={PaymentReceipt} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

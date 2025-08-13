@@ -35,8 +35,8 @@ const AppLogin = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const iconSource = showPass
-    ? require("../../../assets/hideEye.png")
-    : require("../../../assets/eye.png");
+    ? "eye-off-outline"
+    : "eye";
 
   const handleShowPass = () => {
     setShowPass(!showPass);
@@ -47,7 +47,7 @@ const handleLogin = () => {
 
   if (mail?.trim() && password?.trim()) {
     const url = `${LoanApi}/auth/login`;
-    alert(url)
+   
     console.log(url, "thisIshittingURL");
 
     fetch(url, {
@@ -218,33 +218,36 @@ const handleLogin = () => {
           Please fill in your details for Login
         </Text>
         <View style={[styles.container, { marginTop: 10 }]}>
-          <Image
+          <Ionicons name="mail-outline" size={24}/>
+          {/* <Image
             source={require("../../../assets/email.png")}
             style={styles.lockIcon}
-          />
+          /> */}
           <TextInput
             placeholder="Enter your  email"
             onChangeText={setMail}
             value={mail}
-            style={{ flex: 1 }}
+            style={{ flex: 1,marginLeft:10, }}
           />
         </View>
         <View style={[styles.container, { justifyContent: "space-between" }]}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
+            <Ionicons name="lock-closed-outline" size={24}/>
+            {/* <Image
               source={require("../../../assets/lock.png")}
               style={styles.lockIcon}
-            />
+            /> */}
             <TextInput
               placeholder="Enter your  password"
               onChangeText={setPassword}
               value={password}
               secureTextEntry={showPass ? false : true}
-              style={{ width: "75%" }}
+              style={{ width: "75%", marginLeft:10 }}
             />
           </View>
           <Pressable onPress={handleShowPass}>
-            <Image source={iconSource} style={styles.lockIcon} />
+            {/* <Image source={iconSource} style={styles.lockIcon} /> */}
+            <Ionicons name={iconSource} size={24} style={{marginRight:15}}/>
           </Pressable>
         </View>
         <View style={styles.mainBox}>
@@ -303,13 +306,13 @@ const handleLogin = () => {
               Enter your email to reset your password
             </Text>
             <View style={styles.modalInput}>
-              <Image source={require("../../../assets/user.png")} />
+              <Ionicons name="person-outline" size={24}/>
               <TextInput
                 placeholder="Enter your phone number"
                 keyboardType="phone-pad"
                 onChangeText={setPhoneNumber}
                 value={phoneNumber}
-                style={{ flex: 1 }}
+                style={{ flex: 1, marginLeft:10 }}
               />
             </View>
 

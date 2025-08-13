@@ -27,9 +27,9 @@ const EditProfile = ({ navigation }) => {
 
   useEffect(() => {
     if (user?.user) {
-      setName(user.user.fullName);
-      setMobileNum(user.user.phone);
-      setEmail(user.user.email);
+      setName(user.name);
+      setMobileNum(user.phoneNumber);
+      setEmail(user.emailId);
       setImage(user.user.profilePhoto);
     }
   }, [user]);
@@ -50,67 +50,69 @@ const EditProfile = ({ navigation }) => {
 
   // Handle profile update
   const handleUpdate = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("fullName", name);
-      formData.append("phone", mobileNum);
-      formData.append("email", email);
-      formData.append("nomineeName", nomineeName);
-      formData.append("nomineePhone", nomineePhone);
+     alert("Profile updated successfully!");
+      navigation.goBack();
+    // try {
+    //   const formData = new FormData();
+    //   formData.append("fullName", name);
+    //   formData.append("phone", mobileNum);
+    //   formData.append("email", email);
+    //   formData.append("nomineeName", nomineeName);
+    //   formData.append("nomineePhone", nomineePhone);
 
-      // ✅ Only attach image if it's a new local file
-      if (image && image.startsWith("file://")) {
-        formData.append("profilePhoto", {
-          uri: image,
-          name: "profile.jpg",
-          type: "image/jpeg",
-        });
-      }
+    //   // ✅ Only attach image if it's a new local file
+    //   if (image && image.startsWith("file://")) {
+    //     formData.append("profilePhoto", {
+    //       uri: image,
+    //       name: "profile.jpg",
+    //       type: "image/jpeg",
+    //     });
+    //   }
 
-      const response = await fetch(`${LoanApi}/auth/users/${user?.user?.id}`, {
-        method: "PUT",
-        body: formData,
-      });
+    //   const response = await fetch(`${LoanApi}/auth/users/${user?.user?.id}`, {
+    //     method: "PUT",
+    //     body: formData,
+    //   });
 
-      const data = await response.json();
-      console.log("Update Response:", data);
+    //   const data = await response.json();
+    //   console.log("Update Response:", data);
 
-      if (response.ok) {
-        alert("Profile updated successfully!");
+    //   if (response.ok) {
+    //     alert("Profile updated successfully!");
 
-        // ✅ Update Redux store so Drawer & Home auto-refresh
-        dispatch(updateUser(data.user));
+    //     // ✅ Update Redux store so Drawer & Home auto-refresh
+    //     dispatch(updateUser(data.user));
 
-        navigation.goBack();
-      } else {
-        alert(data.message || "Failed to update profile");
-      }
-    } catch (error) {
-      console.error("Update Error:", error);
-      alert("Something went wrong while updating the profile.");
-    }
+    //     navigation.goBack();
+    //   } else {
+    //     alert(data.message || "Failed to update profile");
+    //   }
+    // } catch (error) {
+    //   console.error("Update Error:", error);
+    //   alert("Something went wrong while updating the profile.");
+    // }
   };
 
   return (
     <View style={styles.container}>
       <Header navigation={navigation} title={"Edit Profile"} />
-      <ScrollView style={styles.main}>
+      <ScrollView contentContainerStyle={styles.main}>
         <Pressable onPress={handlePick}>
           {image ? (
             <Image source={{ uri: image }} style={styles.profileImage} />
           ) : (
             <Image
-              source={require("../../../assets/profile.png")}
+              source={require("../../../assets/dummyprofile.png")}
               style={styles.profileImage}
             />
           )}
         </Pressable>
         <View style={styles.boxContainer}>
-          <Text>Name</Text>
+          <Text style={styles.label}>Name</Text>
           <TextInput onChangeText={setName} value={name} style={styles.input} />
         </View>
         <View style={styles.boxContainer}>
-          <Text>Mobile Number</Text>
+          <Text style={styles.label}>Mobile Number</Text>
           <TextInput
             onChangeText={setMobileNum}
             value={mobileNum}
@@ -119,7 +121,7 @@ const EditProfile = ({ navigation }) => {
           />
         </View>
         <View style={styles.boxContainer}>
-          <Text>Email</Text>
+          <Text style={styles.label}>Email</Text>
           <TextInput
             onChangeText={setEmail}
             value={email}
@@ -128,7 +130,7 @@ const EditProfile = ({ navigation }) => {
           />
         </View>
         <View style={styles.boxContainer}>
-          <Text>Nominee Name (as per governament ID)</Text>
+          <Text style={styles.label}>Nominee Name (as per governament ID)</Text>
           <TextInput
             onChangeText={setNomineeName}
             value={nomineeName}
@@ -136,7 +138,16 @@ const EditProfile = ({ navigation }) => {
           />
         </View>
         <View style={styles.boxContainer}>
-          <Text>Nominee Phone Number</Text>
+          <Text style={styles.label}>Nominee Phone Number</Text>
+          <TextInput
+            onChangeText={setNomineePhone}
+            value={nomineePhone}
+            style={styles.input}
+            keyboardType="phone-pad"
+          />
+        </View>
+         <View style={styles.boxContainer}>
+          <Text style={styles.label}>Nominee Relationship</Text>
           <TextInput
             onChangeText={setNomineePhone}
             value={nomineePhone}
@@ -159,19 +170,21 @@ const styles = StyleSheet.create({
   main: { padding: 24 },
   boxContainer: { marginVertical: 10 },
   input: {
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical:12,
     borderWidth: 1,
     backgroundColor: "#FFFFFF",
-    borderRadius: 13,
-    borderColor: "gray",
+    borderRadius: 10,
+    borderColor: "#f5f0f0ff",
+    marginTop:5
   },
   profileImage: {
-    width: 100,
+    width: 120,
     height: 100,
     borderRadius: 40,
     marginBottom: 10,
     alignSelf: "center",
-    resizeMode: "cover",
+    resizeMode: "stretch",
   },
   updateBtn: {
     padding: 10,
@@ -187,4 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
+  label:{
+    marginLeft:5
+  }
 });

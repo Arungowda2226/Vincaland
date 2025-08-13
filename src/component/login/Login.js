@@ -34,47 +34,33 @@ export default function Login({navigation}) {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1, marginTop:10 }}>
       <View style={{ flex: 1, padding: 24, paddingBottom: 100 }}>
-        <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", marginVertical:10}}>
-          <Pressable onPress={handleBack} style={{flexDirection:"row", alignItems:"center", padding:10, backgroundColor:"#5D17EB", borderRadius:13}}>
-            <Ionicons name="chevron-back-outline" size={30} color={"#FFFFFF"}/>
-            <Text style={{marginLeft:5, color:"#FFFFFF", fontWeight:"600", fontSize:16}}>BACK</Text>
-          </Pressable>
-          <Image
-            source={require("../../../assets/Vector.png")}
-            style={{
-              width: width * 0.12,
-              height: height * 0.06,
-              resizeMode: "stretch",
-            }}
-          />
-          <View style={{width:"25%"}}/>
-        </View>
         <Image
-          source={require("../../../assets/Arrow.png")}
+          source={require("../../../assets/Vector.png")}
           style={{
             alignSelf: "center",
-            width: width * 0.15,
-            height: height * 0.05,
+            width: 80,
+            height: 60,
             resizeMode: "stretch",
+            marginTop:40
           }}
         />
-        <Text style={styles.mainLabel}>Premium Members Dashboard</Text>
         <Text style={styles.welLabel}>
-          {showLogin ? "Welcome back" : "Join us today"}
+          {showLogin ? "Hi, Welcome back!" : "Join us today"}
         </Text>
+        <Text style={styles.subLabel}> {showLogin ? "Let's get Started":""}</Text>
         <View style={styles.container}>
           <View style={styles.buttons}>
             <Pressable
               onPress={handleLogin}
               style={[
                 styles.loginBtn,
-                { backgroundColor: showLogin ? "#5D17EB" : "#F6F6F6" },
+                { backgroundColor: showLogin ? "#2415C7" : "#F6F6F6" },
               ]}
             >
               <Text
-                style={[styles.label, { color: !showLogin ? "blue" : "white" }]}
+                style={[styles.label, { color: !showLogin ? "#2415C7" : "#F6F6F6" }]}
               >
                 Login
               </Text>
@@ -83,11 +69,11 @@ export default function Login({navigation}) {
               onPress={handleSignUp}
               style={[
                 styles.loginBtn,
-                { backgroundColor: showReg ? "#5D17EB" : "#F6F6F6" },
+                { backgroundColor: showReg ? "#2415C7" : "#F6F6F6" },
               ]}
             >
               <Text
-                style={[styles.label, { color: !showReg ? "blue" : "white" }]}
+                style={[styles.label, { color: !showReg ? "#2415C7" : "#F6F6F6" }]}
               >
                 Sign Up
               </Text>
@@ -111,16 +97,22 @@ const styles = StyleSheet.create({
   mainLabel: {
     fontWeight: "800",
     fontSize: 18,
-    color: "#5D17EB",
+    color: "#2415C7",
     textAlign: "center",
     marginVertical: 10,
   },
   welLabel: {
-    fontWeight: "600",
-    fontSize: 14,
-    color: "#5D17EB",
+    fontWeight: "900",
+    fontSize: 20,
+    // color: "#2415C7",
     textAlign: "center",
-    marginBottom: 20,
+    marginTop: 10,
+  },
+  subLabel:{
+    fontWeight:"600",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom:15
   },
   container: {
     padding: 20,
@@ -141,7 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 13,
     padding: 10,
-    // marginBottom: 20,
   },
   loginBtn: {
     paddingHorizontal: 30,

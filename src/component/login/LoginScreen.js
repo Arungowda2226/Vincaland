@@ -13,8 +13,10 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import API from "../apidetails/Api";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/userSlice";
 
-export default function LoginScreen({onSwitchToSignin}) {
+export default function LoginScreen({ onSwitchToSignin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showEye, setShowEye] = useState(false);
@@ -22,6 +24,7 @@ export default function LoginScreen({onSwitchToSignin}) {
   const [phoneNum, setPhoneNum] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState("");
+  const dispatch = useDispatch();
 
   const navigation = useNavigation();
 
@@ -41,7 +44,12 @@ export default function LoginScreen({onSwitchToSignin}) {
       });
       const data = await response.json();
       if (!data.error) {
-        navigation.navigate("DashBoard", { userDetails: data });
+        // navigation.navigate("DashBoard", { userDetails: data });
+         dispatch(setUser(data));
+        navigation.navigate("Main", {
+          screen: "Home",
+          params: { userDetails: data },
+        });
       } else {
         Alert.alert("Authentication Failed", data.message || "Try again");
       }
@@ -111,7 +119,11 @@ export default function LoginScreen({onSwitchToSignin}) {
       const data = await res.json();
       console.log("OTP Login:", data);
       if (!data.error) {
-        navigation.navigate("DashBoard", { userDetails: data });
+        navigation.navigate("Main", {
+          screen: "Home",
+          params: { userDetails: data },
+        });
+        // navigation.navigate("DashBoard", { userDetails: data });
         setShowLoginModal(false);
         setOtp("");
         setPhoneNum("");
@@ -126,7 +138,7 @@ export default function LoginScreen({onSwitchToSignin}) {
 
   const handleSignUp = () => {
     onSwitchToSignin();
-  }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -168,8 +180,7 @@ export default function LoginScreen({onSwitchToSignin}) {
       <View style={styles.loginType}>
         <Pressable onPress={handleSignUp} style={styles.typeBtn}>
           <Text style={styles.dontAc}>
-            Don't have an account?{" "}
-            <Text style={styles.withOtp}>Sign Up</Text>
+            Don't have an account? <Text style={styles.withOtp}>Sign Up</Text>
           </Text>
         </Pressable>
 
@@ -246,7 +257,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "800",
     fontSize: 18,
-    color: "blue",
+    color: "#2415C7",
     textAlign: "center",
   },
   inputContainer: {
@@ -257,6 +268,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: "#F6F6F6",
+    marginTop: 5,
   },
   inputIcon: {
     flexDirection: "row",
@@ -264,12 +276,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 10,
     backgroundColor: "#F6F6F6",
+    marginTop: 5,
   },
   signInBtn: {
     padding: 12,
     borderRadius: 13,
     marginVertical: 10,
-    backgroundColor: "#5D17EB",
+    backgroundColor: "#2415C7",
     alignItems: "center",
   },
   btnTxt: {
@@ -286,14 +299,13 @@ const styles = StyleSheet.create({
   },
   withOtp: {
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
     textDecorationLine: "underline",
-    color: "blue",
+    color: "#2415C7",
   },
   dontAc: {
     fontWeight: "600",
     fontSize: 14,
-    color: "blue",
   },
   typeBtn: {
     marginVertical: 10,

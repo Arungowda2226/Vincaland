@@ -15,7 +15,9 @@ import { useSelector } from "react-redux"; // ✅ Redux for auto update
 
 const { width, height } = Dimensions.get("window");
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
+
+  const {userDetails} = route?.params || {} ;
   const { user } = useSelector((state) => state.user); // ✅ Get user from Redux
 
   const [notificationCount, setNotificationCount] = useState(0);
@@ -41,7 +43,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleDashBoard = () => {
-    navigation.navigate("Login");
+    navigation.navigate("DashBoard", { userDetails: userDetails });
   };
 
   const handleInvestment = () => {
@@ -52,8 +54,16 @@ const Home = ({ navigation }) => {
     navigation.navigate("Calculator");
   };
 
+  const handleCustomerService = () => {
+    navigation.navigate("CustomerService");
+  };
+
   const handleSubscribe = () => {
     navigation.navigate("Subscribe");
+  };
+
+  const handleInvite = () => {
+    navigation.navigate("ReferForm", { navigation });
   };
 
   return (
@@ -66,18 +76,8 @@ const Home = ({ navigation }) => {
           />
           <Text style={styles.vincLabel}>VINCALAND</Text>
         </View>
-        <View style={{flexDirection:"row", alignItems:"center"}}>
-        <LinearGradient 
-          colors={["#FFDE51", "#FF159C", "#C627F4"]} 
-          style={styles.subScri}
-          start={{ x: 0, y: 0 }} // Left
-          end={{ x: 1, y: 0 }}
-        >
-          <Pressable >
-            <Text style={styles.subScriLabel}>Subscribe</Text>
-          </Pressable>
-        </LinearGradient>
-        {/* <TouchableOpacity
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {/* <TouchableOpacity
           onPress={receiveNotification}
           style={styles.iconContainer}
         >
@@ -88,16 +88,16 @@ const Home = ({ navigation }) => {
             </View>
           )}
         </TouchableOpacity> */}
-        <Pressable onPress={handleProfile} style={{marginLeft:20}}>
-          <Image
-            source={
-              profileImage
-                ? { uri: profileImage }
-                : require("../../../assets/dummyprofile.png")
-            }
-            style={styles.profileImage}
-          />
-        </Pressable>
+          <Pressable onPress={handleProfile} style={{ marginLeft: 20 }}>
+            <Image
+              source={
+                profileImage
+                  ? { uri: profileImage }
+                  : require("../../../assets/dummyprofile.png")
+              }
+              style={styles.profileImage}
+            />
+          </Pressable>
         </View>
       </View>
 
@@ -119,7 +119,7 @@ const Home = ({ navigation }) => {
                 source={require("../../../assets/dashBoard.png")}
                 style={styles.dashBoardImage}
               />
-              <Text style={styles.dashBoardLabel}>Dashboard</Text>
+              <Text style={styles.dashBoardLabel}>Premium User</Text>
             </Pressable>
           </View>
           <Pressable
@@ -149,9 +149,19 @@ const Home = ({ navigation }) => {
               <Text style={styles.unlockText}>
                 Unlock Premium Benefits Just for You!
               </Text>
-              <Pressable onPress={handleSubscribe} style={styles.subscribeRow}>
+              {/* <Pressable onPress={handleSubscribe} style={styles.subscribeRow}>
                 <Text style={styles.subscribeNowText}>Subscribe Now </Text>
                 <Ionicons name="arrow-forward" size={20} color={"#F62516"} />
+              </Pressable> */}
+              <Pressable onPress={handleSubscribe}>
+                <LinearGradient
+                  colors={["#FFDE51", "#FF159C", "#C627F4"]}
+                  style={styles.subScri}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.subScriLabel}>Subscribe</Text>
+                </LinearGradient>
               </Pressable>
             </View>
             <Image
@@ -172,7 +182,9 @@ const Home = ({ navigation }) => {
             <Text style={styles.inviteSubtitle}>
               A welcome bonus or special discount!
             </Text>
-            <Text style={styles.inviteNowText}>Invite Now</Text>
+            <Pressable onPress={handleInvite}>
+              <Text style={styles.inviteNowText}>Invite Now</Text>
+            </Pressable>
           </View>
           <Image
             source={require("../../../assets/invite.png")}
@@ -189,7 +201,7 @@ const Home = ({ navigation }) => {
             <Text style={styles.customerTitle}>Calculator</Text>
           </Pressable>
 
-          <View style={styles.customerBox}>
+          <Pressable onPress={handleCustomerService} style={styles.customerBox}>
             <Image
               source={require("../../../assets/customer.png")}
               style={styles.customerCareImage}
@@ -198,23 +210,22 @@ const Home = ({ navigation }) => {
               <Text style={styles.customerTitle}>24/7</Text>
               <Text style={styles.customerTitle}>Customer Service</Text>
             </View>
-          </View>
-        </View>
-
-        <View style={styles.promoBanner}>
-          <Image
-            source={require("../../../assets/sales.png")}
-            style={styles.salesIcon}
-          />
-          <Text style={styles.promoText}>
-            Don’t Miss Out – Limited Time Only!
-          </Text>
-          <Image
-            source={require("../../../assets/rightArrow.png")}
-            style={styles.rightArrow}
-          />
+          </Pressable>
         </View>
       </ScrollView>
+      <Pressable onPress={handleSubscribe} style={styles.promoBanner}>
+        <Image
+          source={require("../../../assets/sales.png")}
+          style={styles.salesIcon}
+        />
+        <Text style={styles.promoText}>
+          Don’t Miss Out – Limited Time Only!
+        </Text>
+        <Image
+          source={require("../../../assets/rightArrow.png")}
+          style={styles.rightArrow}
+        />
+      </Pressable>
     </View>
   );
 };
@@ -226,16 +237,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
   },
   iconImage: {
-    height: height * 0.03,
-    width: width * 0.08,
+    height: height * 0.05,
+    width: width * 0.12,
     resizeMode: "stretch",
   },
   iconImageBox: {
@@ -244,12 +255,14 @@ const styles = StyleSheet.create({
   },
   vincLabel: {
     fontWeight: "bold",
-    fontSize: 10,
+    fontSize: 18,
   },
   subScri: {
     borderRadius: 13,
     paddingHorizontal: 20,
     paddingVertical: 7,
+    alignSelf: "flex-start",
+    marginVertical: 5,
   },
   subScriLabel: {
     fontWeight: "500",
@@ -292,22 +305,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#31E100",
     borderRadius: 13,
     alignSelf: "flex-start",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
     marginBottom: 10,
     width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
   loanImage: {
     height: height * 0.07,
-    width: width * 0.14,
+    width: width * 0.18,
     resizeMode: "stretch",
   },
   loanLabel: {
-    fontWeight: "600",
-    fontSize: 18,
+    fontWeight: "900",
+    fontSize: 20,
+    marginLeft: 10,
     color: "#FFFFFF",
-    marginLeft: 20,
   },
   dashBoardContainer: {
     backgroundColor: "#CB2DFB",
@@ -316,21 +328,21 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingVertical: 15,
     width: "100%",
   },
   dashBoardImage: {
-    height: height * 0.05,
-    width: width * 0.1,
+    height: height * 0.07,
+    width: width * 0.14,
     resizeMode: "stretch",
   },
   dashBoardLabel: {
-    fontWeight: "600",
-    fontSize: 16,
-    marginLeft: 20,
-    color:"#FFFFFF"
+    fontWeight: "900",
+    fontSize: 20,
+    marginLeft: 10,
+    color: "#FFFFFF",
+    width: width*0.25,
   },
   investmentImage: {
     height: height * 0.15,
@@ -343,17 +355,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     padding: 10,
     borderRadius: 13,
-    // justifyContent:"space-between",
     alignItems: "center",
   },
   investMentLabel: {
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: "900",
+    fontSize: 20,
     marginTop: 10,
-    color:"#FFFFFF"
+    color: "#FFFFFF",
   },
   subScribcontainer: {
-    // padding: 10,
     paddingHorizontal: 10,
     paddingTop: 10,
     marginVertical: 10,
@@ -365,10 +375,14 @@ const styles = StyleSheet.create({
     shadowColor: "red",
   },
   inviteContainer: {
-    paddingHorizontal: 10,
     marginVertical: 10,
     borderRadius: 13,
     flexDirection: "row",
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
     paddingVertical: 20,
   },
   rowSpaceBetween: {
@@ -378,6 +392,7 @@ const styles = StyleSheet.create({
   },
   subscribeTextContainer: {
     width: "70%",
+    marginBottom: 10,
   },
   subscribeButton: {
     backgroundColor: "#2BB71E",
@@ -412,35 +427,30 @@ const styles = StyleSheet.create({
     width: width * 0.25,
     resizeMode: "stretch",
   },
-  inviteContainer: {
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   inviteTextContainer: {
     width: "68%",
   },
   inviteTitle: {
     color: "#00550D",
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 16,
+    marginTop: -10,
   },
   inviteSubtitle: {
     color: "#000000",
     fontWeight: "400",
     fontSize: 10,
+    marginTop: 5,
   },
   inviteNowText: {
     color: "#0516D3",
     textDecorationLine: "underline",
     fontWeight: "600",
     fontSize: 15,
+    marginTop: 5,
   },
   inviteImage: {
-    width: 100,
+    width: 80,
     height: "100%",
     resizeMode: "stretch",
   },
@@ -448,6 +458,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "stretch", // Ensures children stretch to same height
     justifyContent: "space-between",
+    marginTop: 5,
   },
   customerBox: {
     width: "45%",
@@ -456,7 +467,7 @@ const styles = StyleSheet.create({
     borderColor: "#0000001F",
     borderRadius: 10,
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 20,
   },
   customerImage: {
     height: height * 0.08,
@@ -474,7 +485,7 @@ const styles = StyleSheet.create({
   },
   customerTitle: {
     fontWeight: "500",
-    fontSize: 10,
+    fontSize: 14,
     textAlign: "center",
   },
   customerSubtitle: {
@@ -493,6 +504,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 50,
+    marginHorizontal: 20,
   },
   salesIcon: {
     height: height * 0.03,

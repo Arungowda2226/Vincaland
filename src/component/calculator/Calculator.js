@@ -228,12 +228,12 @@ const Calculator = ({ navigation }) => {
                   }}
                 >
                   <View style={styles.detailsBox}>
-                    <Text>Monthly EMI</Text>
-                    <Text>₹{emi}</Text>
+                    <Text style={styles.amountContent}>Monthly EMI</Text>
+                    <Text style={styles.amountLabel}>₹{emi}</Text>
                   </View>
                   <View style={styles.detailsBox}>
-                    <Text>Principal Amount</Text>
-                    <Text>₹{loanAmount.toLocaleString()}</Text>
+                    <Text style={styles.amountContent}>Principal Amount</Text>
+                    <Text style={styles.amountLabel}>₹{loanAmount.toLocaleString()}</Text>
                   </View>
                 </View>
                 <View
@@ -244,14 +244,14 @@ const Calculator = ({ navigation }) => {
                   }}
                 >
                   <View style={styles.detailsBox}>
-                    <Text>Total Interest</Text>
-                    <Text>
+                    <Text style={styles.amountContent}>Total Interest</Text>
+                    <Text style={styles.amountLabel}>
                       ₹{(emi * loanPeriod * 12 - loanAmount).toLocaleString()}
                     </Text>
                   </View>
                   <View style={styles.detailsBox}>
-                    <Text>Total Amount</Text>
-                    <Text>₹{(emi * loanPeriod * 12).toLocaleString()}</Text>
+                    <Text style={styles.amountContent}>Total Amount</Text>
+                    <Text style={styles.amountLabel}>₹{(emi * loanPeriod * 12).toLocaleString()}</Text>
                   </View>
                 </View>
               </>
@@ -268,12 +268,12 @@ const Calculator = ({ navigation }) => {
                   }}
                 >
                   <View style={styles.detailsBox}>
-                    <Text>Future Value</Text>
-                    <Text>₹{futureValue.toLocaleString()}</Text>
+                    <Text style={styles.amountContent}>Future Value</Text>
+                    <Text style={styles.amountLabel}>₹{futureValue.toLocaleString()}</Text>
                   </View>
                   <View style={styles.detailsBox}>
-                    <Text>Current Value</Text>
-                    <Text>₹{presentValue.toLocaleString()}</Text>
+                    <Text style={styles.amountContent}>Current Value</Text>
+                    <Text style={styles.amountLabel}>₹{presentValue.toLocaleString()}</Text>
                   </View>
                 </View>
                 <View
@@ -284,12 +284,12 @@ const Calculator = ({ navigation }) => {
                   }}
                 >
                   <View style={styles.detailsBox}>
-                    <Text>Annual Rate</Text>
-                    <Text>{inflationRate}%</Text>
+                    <Text style={styles.amountContent}>Annual Rate</Text>
+                    <Text style={styles.amountLabel}>{inflationRate}%</Text>
                   </View>
                   <View style={styles.detailsBox}>
-                    <Text>Time Period</Text>
-                    <Text>{inflationYears} years</Text>
+                    <Text style={styles.amountContent}>Time Period</Text>
+                    <Text style={styles.amountLabel}>{inflationYears} years</Text>
                   </View>
                 </View>
               </>
@@ -364,15 +364,22 @@ const styles = StyleSheet.create({
   detailsBox: {
     padding: 15,
     backgroundColor: "#FFFFFF",
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: "#00000040",
     borderRadius: 13,
     width: "45%",
   },
   footerBox: {
-    position: "absolute",
-    bottom: 210,
-    left: 20,
-    right: 20,
+    top:-50,
+    marginHorizontal:24
   },
+  amountLabel:{
+    fontWeight:"600",
+    fontSize:20
+  },
+  amountContent:{
+    fontWeight:"600",
+    fontSize:12,
+    color:"#0654BB"
+  }
 });

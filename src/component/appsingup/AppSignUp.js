@@ -11,10 +11,11 @@ import {
 import React, { useState } from "react";
 import Checkbox from "expo-checkbox";
 import LoanApi from "../apidetails/LoanApi";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const AppSignUp = ({navigation}) => {
+const AppSignUp = ({ navigation }) => {
   const [isChecked, setChecked] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
@@ -23,27 +24,23 @@ const AppSignUp = ({navigation}) => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
 
-  const iconSource = showPass
-    ? require('../../../assets/hideEye.png')
-    : require('../../../assets/eye.png');
+  const iconSource = showPass ? "eye-off-outline" : "eye";
 
-const iconConfirm = showConfirmPass
-    ? require('../../../assets/hideEye.png')
-    : require('../../../assets/eye.png');
+  const iconConfirm = showConfirmPass ? "eye-off-outline" : "eye";
 
   const handleShowPass = () => {
     setShowPass(!showPass);
-  }
+  };
 
   const handleShowConfirmPass = () => {
-    setShowConfirmPass(!showConfirmPass)
-  }
+    setShowConfirmPass(!showConfirmPass);
+  };
 
   const handleSignUp = () => {
-    navigation.navigate("appLogin")
-  }
+    navigation.navigate("appLogin");
+  };
 
   const handleCreateAccount = () => {
     console.log("clickedCreateAccount");
@@ -53,24 +50,24 @@ const iconConfirm = showConfirmPass
       phone: phone,
       password: password,
       confirmPassword: confirmPassword,
-    }
+    };
 
-    fetch(`${LoanApi}/auth/register`,{
-      method:"POST",
-      headers:{
-         "Content-Type": "application/json"
+    fetch(`${LoanApi}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      body:JSON.stringify(bodyData)
+      body: JSON.stringify(bodyData),
     })
-    .then(res=>res.json())
-    .then((data)=>{
-      console.log(data,"thisIsData");
-      navigation.navigate('Main', { loginUser: data });
-    })
-    .catch((err)=>{
-      console.log(err,"thisIsError");
-    })
-  }
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsData");
+        navigation.navigate("Main", { loginUser: data });
+      })
+      .catch((err) => {
+        console.log(err, "thisIsError");
+      });
+  };
 
   return (
     <View style={styles.main}>
@@ -82,81 +79,66 @@ const iconConfirm = showConfirmPass
         <Text style={styles.topLabel}>Create an acount</Text>
         <Text style={styles.profileLabel}>Set Up Your Profile</Text>
       </View>
-      <ScrollView contentContainerStyle={{marginTop:20, paddingBottom:200}}>
+      <ScrollView contentContainerStyle={{ marginTop: 20, paddingBottom: 200 }}>
         <Text style={styles.signInLabel}>Sign in</Text>
         <Text style={styles.infoLoginLabel}>
           Please fill in your details for sign in
         </Text>
         <View style={[styles.container, { marginTop: 10 }]}>
-          <Image
-            source={require("../../../assets/user.png")}
-            style={styles.lockIcon}
-          />
+          <Ionicons name="person-outline" size={24} />
           <TextInput
             placeholder="Enter full name"
             onChangeText={setFullName}
             value={fullName}
-            style={{flex:1 }}
+            style={{ flex: 1, marginLeft: 10 }}
           />
         </View>
         <View style={styles.container}>
-          <Image
-            source={require("../../../assets/email.png")}
-            style={styles.lockIcon}
-          />
+          <Ionicons name="mail-outline" size={24} />
           <TextInput
             placeholder="Enter your email"
             onChangeText={setEmail}
             value={email}
-            style={{flex:1 }}
+            style={{ flex: 1, marginLeft: 10 }}
           />
         </View>
         <View style={styles.container}>
-          <Image
-            source={require("../../../assets/phone.png")}
-            style={styles.lockIcon}
-          />
+          <Ionicons name="call-outline" size={24} />
           <TextInput
             placeholder="Phone number"
             onChangeText={setPhone}
             value={phone}
-            style={{flex:1 }}
+            style={{ flex: 1, marginLeft: 10 }}
           />
         </View>
         <View style={[styles.container, { justifyContent: "space-between" }]}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              source={require("../../../assets/lock.png")}
-              style={styles.lockIcon}
-            />
+            <Ionicons name="lock-closed-outline" size={24} />
             <TextInput
-              placeholder="Enter your  password"
+              placeholder="Enter your password"
               onChangeText={setPassword}
               value={password}
-              secureTextEntry={showPass? false: true}
-              style={{width:"75%"}}
+              secureTextEntry={showPass ? false : true}
+              style={{ width: "75%", marginLeft:10 }}
             />
           </View>
           <Pressable onPress={handleShowPass}>
-            <Image source={iconSource} style={styles.lockIcon} />          
+            <Ionicons name={iconSource} size={24}/>
           </Pressable>
         </View>
         <View style={[styles.container, { justifyContent: "space-between" }]}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              source={require("../../../assets/lock.png")}
-              style={styles.lockIcon}
-            />
+            <Ionicons name="lock-closed-outline" size={24} />
             <TextInput
               placeholder="Re-Enter your  password"
               onChangeText={setConfirmPassword}
               value={confirmPassword}
-              secureTextEntry={showConfirmPass? false: true}
-              style={{width:"75%"}}
+              secureTextEntry={showConfirmPass ? false : true}
+              style={{ width: "75%", marginLeft:10 }}
             />
           </View>
           <Pressable onPress={handleShowConfirmPass}>
-            <Image source={iconConfirm} style={styles.lockIcon} />          
+             <Ionicons name={iconConfirm} size={24}/>
           </Pressable>
         </View>
         <View style={styles.mainBox}>
@@ -166,7 +148,10 @@ const iconConfirm = showConfirmPass
               onValueChange={setChecked}
               color={isChecked ? "#4630EB" : undefined}
             />
-            <Text style={styles.paragraph}>I Agree to <Text style={{color:"#4630EB"}}>Terms</Text> and <Text style={{color:"#4630EB"}}>Conditions</Text></Text>
+            <Text style={styles.paragraph}>
+              I Agree to <Text style={{ color: "#4630EB" }}>Terms</Text> and{" "}
+              <Text style={{ color: "#4630EB" }}>Conditions</Text>
+            </Text>
           </View>
         </View>
         <Pressable onPress={handleCreateAccount} style={styles.loginBtn}>
@@ -175,7 +160,11 @@ const iconConfirm = showConfirmPass
         <View style={styles.doHaveBox}>
           <Text style={styles.singUpLabel}>Already have an account?</Text>
           <Pressable onPress={handleSignUp}>
-            <Text style={[styles.singUpLabel, { color: "#4630EB", marginLeft:10 }]}>Sign in</Text>
+            <Text
+              style={[styles.singUpLabel, { color: "#4630EB", marginLeft: 10 }]}
+            >
+              Sign in
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -183,7 +172,7 @@ const iconConfirm = showConfirmPass
   );
 };
 
-export default AppSignUp
+export default AppSignUp;
 
 const styles = StyleSheet.create({
   main: {
@@ -215,7 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 13,
     color: "#0516D3",
-    marginTop:7
+    marginTop: 7,
   },
   container: {
     padding: 10,
@@ -243,7 +232,7 @@ const styles = StyleSheet.create({
   paragraph: {
     fontWeight: "400",
     fontSize: 13,
-    marginLeft: 5,
+    marginLeft: 15,
   },
   forgotPassLabel: {
     fontWeight: "500",
@@ -256,21 +245,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#0516D3",
     marginVertical: 10,
     marginTop: 20,
-    borderRadius: 13
+    borderRadius: 13,
   },
   loginLabel: {
     fontWeight: "600",
     fontSize: 17,
-    color: "#FFFFFF"
+    color: "#FFFFFF",
   },
   doHaveBox: {
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    marginVertical: 10
+    marginVertical: 10,
   },
   singUpLabel: {
     fontWeight: "500",
     fontSize: 14,
-  }
+  },
 });
