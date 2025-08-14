@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import Header from "../header/Header";
 
-const WithdrawnModal = ({ closeModal }) => {
+const WithdrawnModal = ({ closeModal, dashBoardDetails }) => {
   return (
     <View style={styles.container}>
       <Header title="Withdrawn" closeModal={closeModal} />
@@ -11,7 +11,7 @@ const WithdrawnModal = ({ closeModal }) => {
 
         <Text style={styles.subText}>
           Amount available for withdrawal:{" "}
-          <Text style={styles.amount}>₹48,600</Text>
+          <Text style={styles.amount}>₹{dashBoardDetails.returnsAmount}</Text>
         </Text>
 
         <Text style={styles.subText}>

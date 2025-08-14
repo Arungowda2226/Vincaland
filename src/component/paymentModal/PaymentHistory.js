@@ -21,7 +21,7 @@ const PaymentHistory = ({ navigation }) => {
             </Text>
           </View>
           <Text style={styles.priceText}>
-            ₹2000 <Text style={styles.highlightedPrice}>₹1200</Text>/month
+            <Text style={styles.highlightedPrice}>₹1200</Text>/month
           </Text>
           <Text style={styles.dueDate}>
             Your next subscription installment is due 29 jun 2025

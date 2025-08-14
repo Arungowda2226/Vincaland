@@ -24,6 +24,8 @@ export default function LoginScreen({ onSwitchToSignin }) {
   const [phoneNum, setPhoneNum] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState("");
+  const [resendAvailable, setResendAvailable] = useState(false);
+  const [countdown, setCountdown] = useState(120); // 120 seconds (2 min)
   const dispatch = useDispatch();
 
   const navigation = useNavigation();
@@ -45,7 +47,7 @@ export default function LoginScreen({ onSwitchToSignin }) {
       const data = await response.json();
       if (!data.error) {
         // navigation.navigate("DashBoard", { userDetails: data });
-         dispatch(setUser(data));
+        dispatch(setUser(data));
         navigation.navigate("Main", {
           screen: "Home",
           params: { userDetails: data },
@@ -60,24 +62,40 @@ export default function LoginScreen({ onSwitchToSignin }) {
   };
 
   const handleSendOtp = async () => {
-    if (!phoneNum) {
-      Alert.alert("Validation", "Enter phone number");
-      return;
-    }
+  if (!phoneNum) {
+    Alert.alert("Validation", "Enter phone number");
+    return;
+  }
 
-    try {
-      const res = await fetch(`${API}/otp/sendOtp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber: phoneNum }),
+  try {
+    const res = await fetch(`${API}/otp/sendOtp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phoneNumber: phoneNum }),
+    });
+    const data = await res.json();
+    console.log("OTP Sent:", data);
+    setShowOtp(true);
+
+    // start countdown
+    setResendAvailable(false);
+    setCountdown(120);
+    let timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setResendAvailable(true);
+          return 0;
+        }
+        return prev - 1;
       });
-      const data = await res.json();
-      console.log("OTP Sent:", data);
-      setShowOtp(true);
-    } catch (error) {
-      console.error("OTP send error:", error);
-    }
-  };
+    }, 1000);
+
+  } catch (error) {
+    console.error("OTP send error:", error);
+  }
+};
+
 
   const handleVerifyOtp = async () => {
     if (!otp) {
@@ -233,6 +251,20 @@ export default function LoginScreen({ onSwitchToSignin }) {
                     style={{ flex: 1 }}
                   />
                 </View>
+
+                {resendAvailable ? (
+                  <Pressable onPress={handleSendOtp} style={{marginVertical:10, alignSelf:"center"}}>
+                    <Text style={styles.withOtp}>Resend OTP</Text>
+                  </Pressable>
+                ) : (
+                  <Text style={{ color: "gray", textAlign: "center", marginBottom:10 }}>
+                    Resend in{" "}
+                    {Math.floor(countdown / 60)
+                      .toString()
+                      .padStart(2, "0")}
+                    :{(countdown % 60).toString().padStart(2, "0")}
+                  </Text>
+                )}
               </>
             )}
 

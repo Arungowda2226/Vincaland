@@ -134,19 +134,37 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        // setPaymentInfos(data.paymentInfos);
-        const verifiedPayments = data.paymentInfos.filter(
-          (payment) => payment.isVerified === true
-        );
+        console.log(data, "thisPayment");
 
-        console.log(verifiedPayments, "payment (verified only)");
+        setPaymentInfos(data.paymentInfos);
+        // const verifiedPayments = data.paymentInfos.filter(
+        //   (payment) => payment.isVerified === true
+        // );
 
-        setPaymentInfos(verifiedPayments);
+        // console.log(verifiedPayments, "payment (verified only)");
+
+        // setPaymentInfos(verifiedPayments);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+  function calculateDurationInMonths(joinedOn) {
+    const now = new Date();
+
+    const yearsDiff = now.getFullYear() - joinedOn.getFullYear();
+    const monthsDiff = now.getMonth() - joinedOn.getMonth();
+
+    const totalMonths = yearsDiff * 12 + monthsDiff;
+
+    // add +1 if you want the duration to be inclusive of the start month
+    return totalMonths + 1;
+  }
+
+  const monthsBeenMember = calculateDurationInMonths(
+    new Date(dashBoardDetails.joinedOn)
+  );
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -274,11 +292,9 @@ const DashBoard = ({ navigation, route }) => {
             <View>
               <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
               <Text style={styles.totalAmount}>
-                ₹
-                {dashBoardDetails.investedAmount +
-                  dashBoardDetails.returnsAmount}
+                ₹{dashBoardDetails.returnsAmount}
               </Text>
-              <Text style={styles.readLabel}>Ready to withdraw anytime</Text>
+              <Text style={styles.readLabel}>Ready to withdraw</Text>
             </View>
             <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
               <Ionicons name="wallet-outline" size={20} color={"white"} />
@@ -292,7 +308,7 @@ const DashBoard = ({ navigation, route }) => {
                 <Ionicons name="calendar-outline" size={20} color="#000" />
               </View>
               <View style={styles.firstSubBox}>
-                <Text style={styles.numLabel}>1</Text>
+                <Text style={styles.numLabel}>{monthsBeenMember}</Text>
                 <Text style={styles.infoLabel}>
                   Active since {formatDate(dashBoardDetails.joinedOn)}
                 </Text>
@@ -561,7 +577,7 @@ const DashBoard = ({ navigation, route }) => {
                 </Text>
               </View>
             </View>
-            <View style={styles.paymentSubContainer}>
+            {/* <View style={styles.paymentSubContainer}>
               <View style={{ width: width * 0.5 }}>
                 <Text>Auto-debit scheduled</Text>
                 <Text>
@@ -571,7 +587,7 @@ const DashBoard = ({ navigation, route }) => {
               <Pressable style={styles.activeBtn}>
                 <Text>Active</Text>
               </Pressable>
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       ) : (
@@ -594,7 +610,10 @@ const DashBoard = ({ navigation, route }) => {
         <ReferForm closeModal={setShowReferForm} userDetails={userDetails} />
       </Modal>
       <Modal visible={showWithdrawModal} animationType="slide">
-        <WithdrawnModal closeModal={setShowWithdrawModal} />
+        <WithdrawnModal
+          closeModal={setShowWithdrawModal}
+          dashBoardDetails={dashBoardDetails}
+        />
       </Modal>
     </View>
   );
@@ -727,8 +746,11 @@ const styles = StyleSheet.create({
   },
   nanReturnLabel: {
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 12,
     color: "#2415C7",
+    textAlign:"left",
+    width:"auto",
+    // backgroundColor:"red"
   },
   viewContainer: {
     padding: 3,

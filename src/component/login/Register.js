@@ -71,6 +71,7 @@ const Register = ({ onSwitchToLogin, navigation }) => {
           Alert.alert("Error", data.message || "Failed to send OTP");
         } else {
           Alert.alert("Success", "OTP sent successfully!");
+          setShowAddPhoneModal(false);
         }
       })
       .catch((error) => {
@@ -191,44 +192,49 @@ const handleSignIn = () => {
 };
 
 
-  const handleVerfityOtp = () => {
-    const otpCode = otpDigits.join(""); // Combine digits into one string
+const handleVerfityOtp = () => {
+  const otpCode = otpDigits.join(""); // Combine digits into one string
 
-    if (otpCode.length < 6) {
-      Alert.alert("Incomplete OTP", "Please enter all 6 digits of the OTP.");
-      return;
-    }
+  if (otpCode.length < 6) {
+    Alert.alert("Incomplete OTP", "Please enter all 6 digits of the OTP.");
+    return;
+  }
 
-    console.log(`${API}/otp/verify-otp`);
-    fetch(`${API}/otp/verify-otp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        phoneNumber: phone,
-        otp: otpCode,
-        isSignup: false,
-      }),
+  console.log(`${API}/otp/verify-otp`);
+  fetch(`${API}/otp/verify-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phoneNumber: phone,
+      otp: otpCode,
+      isSignup: false,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Response:", data);
+
+      // ✅ If backend sends message with "success"
+      if (
+        data.message &&
+        data.message.toLowerCase().includes("success")
+      ) {
+        Alert.alert("Success", "OTP verified successfully!");
+        setShowAddPhoneModal(false);
+        setIsPhoneVerified(true);
+      } else {
+        Alert.alert("Error", data.message || "OTP verification failed");
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Response:", data);
-        if (!data.error) {
-          if (!data.error) {
-            Alert.alert("Success", "OTP verified successfully!");
-            setShowAddPhoneModal(false);
-            setIsPhoneVerified(true); // ✅ Set phone as verified
-          }
-        } else {
-          Alert.alert("Error", data.message || "OTP verification failed");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        Alert.alert("Network Error", "Failed to verify OTP. Please try again.");
-      });
-  };
+    .catch((error) => {
+      console.error("Error:", error);
+      Alert.alert("Network Error", "Failed to verify OTP. Please try again.");
+    });
+};
+
+
 
   const handleSignUp = () => {
     onSwitchToLogin();
@@ -386,6 +392,9 @@ const handleSignIn = () => {
             </Text>
             <Pressable onPress={handleVerfityOtp} style={styles.modalButton}>
               <Text style={{ color: "white" }}>Submit</Text>
+            </Pressable>
+            <Pressable onPress={()=> setShowAddPhoneModal(false)} style={styles.modalButton}>
+              <Text style={{ color: "white" }}>Close</Text>
             </Pressable>
           </View>
         </View>

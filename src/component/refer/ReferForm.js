@@ -1,117 +1,149 @@
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
 import API from "../apidetails/Api";
 
 const ReferForm = ({ closeModal, userDetails, route }) => {
-  const {navigation} = route?.params || {};
+  const { navigation } = route?.params || {};
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
- 
+
   const handleSubmit = () => {
-  if (!name.trim()) {
-    Alert.alert("Validation Error", "Name is required.");
-    return;
-  } else if (name.trim().length < 3) {
-    Alert.alert("Validation Error", "Name must be at least 3 characters.");
-    return;
-  }
-  const mobileRegex = /^[6-9]\d{9}$/;
-  if (!number.trim()) {
-    Alert.alert("Validation Error", "Mobile number is required.");
-    return;
-  } else if (!mobileRegex.test(number.trim())) {
-    Alert.alert("Validation Error", "Enter a valid 10-digit mobile number.");
-    return;
-  }
+    if (!name.trim()) {
+      Alert.alert("Validation Error", "Name is required.");
+      return;
+    } else if (name.trim().length < 3) {
+      Alert.alert("Validation Error", "Name must be at least 3 characters.");
+      return;
+    }
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!number.trim()) {
+      Alert.alert("Validation Error", "Mobile number is required.");
+      return;
+    } else if (!mobileRegex.test(number.trim())) {
+      Alert.alert("Validation Error", "Enter a valid 10-digit mobile number.");
+      return;
+    }
 
-  // Email validation (only if provided)
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (email.trim() && !emailRegex.test(email.trim())) {
-    Alert.alert("Validation Error", "Enter a valid email address.");
-    return;
-  }
+    // Email validation (only if provided)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.trim() && !emailRegex.test(email.trim())) {
+      Alert.alert("Validation Error", "Enter a valid email address.");
+      return;
+    }
 
-  // Message validation
-  if (!message.trim()) {
-    Alert.alert("Validation Error", "Message is required.");
-    return;
-  } else if (message.trim().length < 10) {
-    Alert.alert("Validation Error", "Message must be at least 10 characters.");
-    return;
-  }
+    // Message validation
+    if (!message.trim()) {
+      Alert.alert("Validation Error", "Message is required.");
+      return;
+    } else if (message.trim().length < 10) {
+      Alert.alert(
+        "Validation Error",
+        "Message must be at least 10 characters."
+      );
+      return;
+    }
 
-  const bodyData = {
-    name: name.trim(),
-    mobileNumber: number.trim(),
-    email: email.trim(),
-    message: message.trim(),
-    refByPhoneNumber: userDetails.phoneNumber,
-  };
+    const bodyData = {
+      name: name.trim(),
+      mobileNumber: number.trim(),
+      email: email.trim(),
+      message: message.trim(),
+      refByPhoneNumber: userDetails.phoneNumber,
+    };
 
-  fetch(`${API}/referral`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(bodyData),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data, "thisIsReferResponse");
-      if (data?.success) {
-        Alert.alert("Success", "Referral submitted successfully!", [
-          { text: "OK", onPress: () => closeModal(false) },
-        ]);
-      } else {
-        Alert.alert(
-          "Error",
-          data?.message || "Something went wrong. Please try again."
-        );
-      }
+    fetch(`${API}/referral`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyData),
     })
-    .catch((err) => {
-      console.log(err, "thisIsError");
-      Alert.alert("Error", "Something went wrong. Please try again.");
-    });
-};
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsReferResponse");
+        if (data?.success) {
+          Alert.alert("Success", "Referral submitted successfully!", [
+            { text: "OK", onPress: () => closeModal(false) },
+          ]);
+        } else {
+          Alert.alert(
+            "Error",
+            data?.message || "Something went wrong. Please try again."
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err, "thisIsError");
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      });
+  };
 
   return (
     <View style={{ flex: 1 }}>
-      <Header title={"Refer & Earn"} closeModal={closeModal} navigation={navigation}/>
+      <Header
+        title={"Refer & Earn"}
+        closeModal={closeModal}
+        navigation={navigation}
+      />
       <View style={{ flex: 1, padding: 24 }}>
-        <TextInput
-          placeholder="Enter Name"
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          placeholder="Enter Mobile Number"
-          style={styles.input}
-          keyboardType="phone-pad"
-          value={number}
-          onChangeText={setNumber}
-        />
-        <TextInput
-          placeholder="Enter Email address (optional)"
-          style={styles.input}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <View style={styles.container}>
+          <Text style={styles.mainLabel}>Enter Name :</Text>
+          <TextInput
+            placeholder="Enter Name"
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            placeholderTextColor="#0c0b0bff"
+          />
+        </View>
 
-        <TextInput
-          placeholder="Enter Message"
-          style={[styles.input, styles.textArea]}
-          multiline={true}
-          numberOfLines={5}
-          textAlignVertical="top"
-          value={message}
-          onChangeText={setMessage}
-        />
+        <View style={styles.container}>
+          <Text style={styles.mainLabel}>Enter Mobile Number :</Text>
+          <TextInput
+            placeholder="Enter Mobile Number"
+            style={styles.input}
+            keyboardType="phone-pad"
+            value={number}
+            onChangeText={setNumber}
+            placeholderTextColor="#0c0b0bff"
+          />
+        </View>
+        <View style={styles.container}>
+          <Text style={styles.mainLabel}>Enter Email address :</Text>
+          <TextInput
+            placeholder="Enter Email address (optional)"
+            style={styles.input}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor="#0c0b0bff"
+          />
+        </View>
+
+        <View style={styles.container}>
+          <Text style={styles.mainLabel}>Enter Message :</Text>
+
+          <TextInput
+            placeholder="Enter Message"
+            style={[styles.input, styles.textArea]}
+            multiline={true}
+            numberOfLines={5}
+            textAlignVertical="top"
+            value={message}
+            onChangeText={setMessage}
+            placeholderTextColor="#0c0b0bff"
+          />
+        </View>
 
         <Pressable
           onPress={handleSubmit}
@@ -135,22 +167,28 @@ const ReferForm = ({ closeModal, userDetails, route }) => {
 export default ReferForm;
 
 const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+  },
+  mainLabel: {
+    marginLeft: 5,
+    fontWeight: "600",
+    fontSize: 16,
+  },
   input: {
-    width: "100%",                
-    minHeight: 48,               
+    width: "100%",
     paddingHorizontal: 12,
     paddingVertical: 10,
     backgroundColor: "#FFFFFF",
-    borderWidth: 1,             
+    borderWidth: 1,
     borderRadius: 12,
-    marginVertical: 8,
-    borderColor: "#ccc",         
+    marginVertical: 5,
+    borderColor: "#ccc",
     fontSize: 16,
     color: "#000",
   },
   textArea: {
     height: 120,
-    textAlignVertical: "top",     
+    textAlignVertical: "top",
   },
 });
-
