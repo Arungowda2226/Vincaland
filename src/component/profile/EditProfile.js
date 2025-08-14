@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -13,6 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import LoanApi from "../apidetails/LoanApi";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/userSlice";
+import API from "../apidetails/Api";
 
 const EditProfile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,15 +26,40 @@ const EditProfile = ({ navigation }) => {
   const [mobileNum, setMobileNum] = useState("");
   const [nomineeName, setNomineeName] = useState("");
   const [nomineePhone, setNomineePhone] = useState("");
+  const [nomineeRelationship, setNomineeRelationship] = useState("");
+  const [nomineeDetails, setNomineeDetails] = useState({});
 
   useEffect(() => {
-    if (user?.user) {
+    console.log(user, "userInEdit");
+
+    if (user) {
       setName(user.name);
       setMobileNum(user.phoneNumber);
       setEmail(user.emailId);
-      setImage(user.user.profilePhoto);
+      getNomineeDetails();
+      // setImage(user.user.profilePhoto);
     }
   }, [user]);
+
+  const getNomineeDetails = () => {
+    fetch(`${API}/investors/findByEmail`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "thisIsNomineeDetails");
+        setNomineeName(data?.nomineeName);
+        setNomineePhone(data?.nomineePhoneNumber);
+        setNomineeRelationship(data?.nomineeRelationship);
+        setNomineeDetails(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   // Pick image from gallery
   const handlePick = async () => {
@@ -49,55 +76,110 @@ const EditProfile = ({ navigation }) => {
   };
 
   // Handle profile update
-  const handleUpdate = async () => {
-     alert("Profile updated successfully!");
-      navigation.goBack();
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("fullName", name);
-    //   formData.append("phone", mobileNum);
-    //   formData.append("email", email);
-    //   formData.append("nomineeName", nomineeName);
-    //   formData.append("nomineePhone", nomineePhone);
+  // const handleUpdate = async () => {
+  //    alert("Profile updated successfully!");
+  //     navigation.goBack();
+  // try {
+  //   const formData = new FormData();
+  //   formData.append("fullName", name);
+  //   formData.append("phone", mobileNum);
+  //   formData.append("email", email);
+  //   formData.append("nomineeName", nomineeName);
+  //   formData.append("nomineePhone", nomineePhone);
 
-    //   // ✅ Only attach image if it's a new local file
-    //   if (image && image.startsWith("file://")) {
-    //     formData.append("profilePhoto", {
-    //       uri: image,
-    //       name: "profile.jpg",
-    //       type: "image/jpeg",
-    //     });
-    //   }
+  //   // ✅ Only attach image if it's a new local file
+  //   if (image && image.startsWith("file://")) {
+  //     formData.append("profilePhoto", {
+  //       uri: image,
+  //       name: "profile.jpg",
+  //       type: "image/jpeg",
+  //     });
+  //   }
 
-    //   const response = await fetch(`${LoanApi}/auth/users/${user?.user?.id}`, {
-    //     method: "PUT",
-    //     body: formData,
-    //   });
+  //   const response = await fetch(`${LoanApi}/auth/users/${user?.user?.id}`, {
+  //     method: "PUT",
+  //     body: formData,
+  //   });
 
-    //   const data = await response.json();
-    //   console.log("Update Response:", data);
+  //   const data = await response.json();
+  //   console.log("Update Response:", data);
 
-    //   if (response.ok) {
-    //     alert("Profile updated successfully!");
+  //   if (response.ok) {
+  //     alert("Profile updated successfully!");
 
-    //     // ✅ Update Redux store so Drawer & Home auto-refresh
-    //     dispatch(updateUser(data.user));
+  //     // ✅ Update Redux store so Drawer & Home auto-refresh
+  //     dispatch(updateUser(data.user));
 
-    //     navigation.goBack();
-    //   } else {
-    //     alert(data.message || "Failed to update profile");
-    //   }
-    // } catch (error) {
-    //   console.error("Update Error:", error);
-    //   alert("Something went wrong while updating the profile.");
-    // }
+  //     navigation.goBack();
+  //   } else {
+  //     alert(data.message || "Failed to update profile");
+  //   }
+  // } catch (error) {
+  //   console.error("Update Error:", error);
+  //   alert("Something went wrong while updating the profile.");
+  // }
+  // };
+
+const handleUpdate = async () => {
+  if (!nomineeName || !nomineePhone || !nomineeRelationship) {
+    Alert.alert("Missing Fields", "Please fill all nominee details");
+    return;
+  }
+
+  if(nomineePhone.length !== 10) {
+    alert('phone number should be 10 digits');
+    return;
+  }
+
+  const bodyData = {
+    nomineeName,
+    nomineePhoneNumber: nomineePhone,
+    nomineeRelationship,
   };
+
+  console.log("🚀 Sending Body Data:", bodyData);
+
+  try {
+    const response = await fetch(`${API}/investors/addNomination`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify(bodyData),
+    });
+
+    const data = await response.json();
+    console.log("✅ Update Response:", data);
+
+    if (response.ok && !data.error) {
+      Alert.alert("Success", "Nominee details updated successfully");
+
+      // ✅ Update Redux user with new nominee info
+      dispatch(
+        updateUser({
+          nomineeName: data.nomineeName,
+          nomineePhoneNumber: data.nomineePhoneNumber,
+          nomineeRelationship: data.nomineeRelationship,
+        })
+      );
+
+      navigation.goBack();
+    } else {
+      Alert.alert("Update Failed", data.message || "Something went wrong");
+    }
+  } catch (err) {
+    console.log("❌ Update Error:", err);
+    Alert.alert("Error", "Failed to update nominee details");
+  }
+};
+
 
   return (
     <View style={styles.container}>
       <Header navigation={navigation} title={"Edit Profile"} />
       <ScrollView contentContainerStyle={styles.main}>
-        <Pressable onPress={handlePick}>
+        {/* <Pressable onPress={handlePick}>
           {image ? (
             <Image source={{ uri: image }} style={styles.profileImage} />
           ) : (
@@ -106,10 +188,15 @@ const EditProfile = ({ navigation }) => {
               style={styles.profileImage}
             />
           )}
-        </Pressable>
+        </Pressable> */}
         <View style={styles.boxContainer}>
           <Text style={styles.label}>Name</Text>
-          <TextInput onChangeText={setName} value={name} style={styles.input} />
+          <TextInput
+            onChangeText={setName}
+            value={name}
+            style={styles.input}
+            editable={false}
+          />
         </View>
         <View style={styles.boxContainer}>
           <Text style={styles.label}>Mobile Number</Text>
@@ -118,6 +205,7 @@ const EditProfile = ({ navigation }) => {
             value={mobileNum}
             style={styles.input}
             keyboardType="phone-pad"
+            editable={false}
           />
         </View>
         <View style={styles.boxContainer}>
@@ -127,6 +215,7 @@ const EditProfile = ({ navigation }) => {
             value={email}
             style={styles.input}
             keyboardType="email-address"
+            editable={false}
           />
         </View>
         <View style={styles.boxContainer}>
@@ -146,13 +235,12 @@ const EditProfile = ({ navigation }) => {
             keyboardType="phone-pad"
           />
         </View>
-         <View style={styles.boxContainer}>
+        <View style={styles.boxContainer}>
           <Text style={styles.label}>Nominee Relationship</Text>
           <TextInput
-            onChangeText={setNomineePhone}
-            value={nomineePhone}
+            onChangeText={setNomineeRelationship}
+            value={nomineeRelationship}
             style={styles.input}
-            keyboardType="phone-pad"
           />
         </View>
       </ScrollView>
@@ -171,12 +259,12 @@ const styles = StyleSheet.create({
   boxContainer: { marginVertical: 10 },
   input: {
     paddingHorizontal: 10,
-    paddingVertical:12,
+    paddingVertical: 12,
     borderWidth: 1,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     borderColor: "#f5f0f0ff",
-    marginTop:5
+    marginTop: 5,
   },
   profileImage: {
     width: 120,
@@ -200,7 +288,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
-  label:{
-    marginLeft:5
-  }
+  label: {
+    marginLeft: 5,
+  },
 });

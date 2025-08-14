@@ -119,6 +119,7 @@ export default function LoginScreen({ onSwitchToSignin }) {
       const data = await res.json();
       console.log("OTP Login:", data);
       if (!data.error) {
+        dispatch(setUser(data));
         navigation.navigate("Main", {
           screen: "Home",
           params: { userDetails: data },

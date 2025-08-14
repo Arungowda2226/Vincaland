@@ -8,6 +8,7 @@ import {
   View,
   Animated,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Header from "../header/Header";
@@ -27,6 +28,7 @@ const { width, height } = Dimensions.get("window");
 
 const DashBoard = ({ navigation, route }) => {
   const { userDetails } = route?.params;
+  const [loadScreen, setLoadScreen] = useState(true);
   const [isTable, setIsTable] = useState(true);
   const [isChart, setIsChart] = useState(false);
   const [dashBoardDetails, setDashBoardDetails] = useState({});
@@ -112,11 +114,13 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "thisIsInvestorDashBoardData");
+        console.log(data, "data");
         setDashBoardDetails(data);
+        setLoadScreen(false);
       })
       .catch((err) => {
         console.log(err);
+        setLoadScreen(false);
       });
   };
 
@@ -130,8 +134,14 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setPaymentInfos(data.paymentInfos);
-        console.log(data.paymentInfos, "thisIsInvestorDashBoardPaymentData");
+        // setPaymentInfos(data.paymentInfos);
+        const verifiedPayments = data.paymentInfos.filter(
+          (payment) => payment.isVerified === true
+        );
+
+        console.log(verifiedPayments, "payment (verified only)");
+
+        setPaymentInfos(verifiedPayments);
       })
       .catch((err) => {
         console.log(err);
@@ -239,7 +249,11 @@ const DashBoard = ({ navigation, route }) => {
   };
 
   const generateReceipt = async (item) => {
-    navigation.navigate("PaymentReceipt",{data:item, chartData, dashBoardDetails})
+    navigation.navigate("PaymentReceipt", {
+      data: item,
+      chartData,
+      dashBoardDetails,
+    });
   };
 
   return (
@@ -249,274 +263,324 @@ const DashBoard = ({ navigation, route }) => {
         navigation={navigation}
         // userIcon={true}
       />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <LinearGradient
-          colors={["#0516D3", "#D21084"]}
-          start={{ x: 0, y: 0 }} // Left
-          end={{ x: 1, y: 0 }}
-          style={styles.firstContainer}
-        >
-          <View>
-            <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
-            <Text style={styles.totalAmount}>
-              ₹
-              {dashBoardDetails.investedAmount + dashBoardDetails.returnsAmount}
-            </Text>
-            <Text style={styles.readLabel}>
-              Ready to withdraw anytime
-            </Text>
-          </View>
-          <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
-            <Ionicons name="wallet-outline" size={20} color={"white"} />
-            <Text style={styles.withdrawBtnLabel}>withdraw</Text>
-          </Pressable>
-        </LinearGradient>
-        <View style={styles.secMainContainer}>
-          <View style={styles.secContainer}>
-            <View style={styles.firstBox}>
-              <Text style={styles.label}>Months Enrolled</Text>
-              <Ionicons name="calendar-outline" size={20} color="#000" />
-            </View>
-            <View style={styles.firstSubBox}>
-              <Text style={styles.numLabel}>1</Text>
-              <Text style={styles.infoLabel}>
-                Active since {formatDate(dashBoardDetails.joinedOn)}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.secSubContainer}>
-            <View style={styles.firstBox}>
-              <Text style={styles.secSublabel}>Total Paid</Text>
-              <Ionicons name="wallet-outline" size={20} color="white" />
-            </View>
-            <View style={styles.firstSubBox}>
-              <Text style={styles.secNumLabel}>
-                ₹{dashBoardDetails.investedAmount}
-              </Text>
-              <Text style={styles.secInfoLabel}>₹1200 per month (average)</Text>
-            </View>
-          </View>
-        </View>
-        <Pressable
-          onPress={handleShowReferForm}
-          style={{
-            padding: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "#FCC92F",
-            borderRadius: 13,
-            marginVertical: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons name="chatbubble-ellipses-outline" size={30} />
-            <Text style={{ marginLeft: 10, fontWeight: "600", fontSize: 14 }}>
-              Message & Refer
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={30} />
-        </Pressable>
-        <View
-          style={{
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 13,
-            backgroundColor: "white",
-            borderColor: "#dbe3e7ff",
-          }}
-        >
-          <View style={styles.overViewContainer}>
-            <View style={{ width: width * 0.4 }}>
-              <Text style={{fontWeight:"600", fontSize:16}}>Subscription Overview</Text>
-              <Text>Your Money growth and returns over time</Text>
-            </View>
-            <Pressable style={styles.nanReturnBtn}>
-              <Image source={require("../../../assets/Arrow.png")} style={{width: width*0.08, height:height*0.03, resizeMode:"stretch"}}/>
-              <Text style={styles.nanReturnLabel}>
-                {" "}
-                + {((currentReturns / currentInvested) * 100).toFixed(0)}%
-                Returns
-              </Text>
-            </Pressable>
-          </View>
-          <View style={styles.viewContainer}>
-            <Pressable
-              onPress={handleTable}
-              style={[
-                styles.box,
-                { backgroundColor: isTable ? "white" : null },
-              ]}
-            >
-              <Text style={styles.viewTypeLabel}>Table View</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleChart}
-              style={[
-                styles.box,
-                { backgroundColor: isChart ? "white" : null },
-              ]}
-            >
-              <Text style={styles.viewTypeLabel}>Chart View</Text>
-            </Pressable>
-          </View>
-          {isTable ? (
-            <View style={{width:"100%"}}>
-              <View style={styles.tableViewBox}>
-                <Text style={[styles.tableLabel,{width:"13%"}]}>MONTH</Text>
-                <Text style={[styles.tableLabel,{width:"18%"}]}>SUBSCRIPTION</Text>
-                <Text style={[styles.tableLabel,{width:"25%"}]}>PREMIUM SERVICES PROVIDED</Text>
-                <Text style={[styles.tableLabel,{width:"15%"}]}>EXPECTED REFUND</Text>
-                <Text style={[styles.tableLabel,{width:"12%"}]}>RECEIPT</Text>
-              </View>
-              {chartData.map((item, indx) => (
-                <View style={styles.dataListContainer} key={indx}>
-                  <Text style={[styles.tableLabel,{width:"13%"}]}>{item.month}</Text>
-                  <Text style={[styles.tableLabel,{width:"18%"}]}>{item.invested}</Text>
-                  <Text style={[styles.tableLabel,{width:"25%"}]}>₹2000</Text>
-                  <Text style={[styles.tableLabel,{width:"15%"}]}>₹3000{/* {item.returns} */}</Text>
-                  <Ionicons onPress={() => generateReceipt(item)} name="download-outline" size={24} color={"#33A800"} style={{width:"12%"}}/>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={{ paddingBottom: 20 }}>
-                <BarChart
-                  stackData={stackedData}
-                  barWidth={barWidth}
-                  barBorderRadius={8}
-                  noOfSections={noOfSections}
-                  maxValue={maxValue}
-                  spacing={spacing}
-                  yAxisThickness={0}
-                  yAxisLabelTexts={yAxisLabelTexts}
-                  showValuesAsTopLabel={false}
-                  showYAxisIndices={false}
-                  hideRules
-                  isAnimated
-                  showLegend={true}
-                  onPress={handleBarPress} // ✅ Only item & index
-                />
-
-                {selectedBar && (
-                  <Animated.View
-                    style={[
-                      styles.tooltip,
-                      {
-                        transform: [
-                          { translateX: tooltipPosition.x },
-                          { translateY: tooltipPosition.y },
-                        ],
-                      },
-                    ]}
-                  >
-                    <Text style={styles.tooltipTitle}>{selectedBar.label}</Text>
-                    {selectedBar.stacks.map((s, i) => (
-                      <Text key={i} style={{ color: s.color }}>
-                        {s.label}: ₹{s.value}
-                      </Text>
-                    ))}
-                  </Animated.View>
-                )}
-              </View>
-            </ScrollView>
-          )}
-          <View
-            style={{
-              marginVertical: 10,
-              borderWidth: 1,
-              borderColor: themeColor.BORDER_CLR,
-            }}
-          />
-          <View style={styles.extraDetails}>
-            <View style={styles.subExtraDetails}>
-              <Text style={styles.tableSubLabel}>Monthly Membership Fee</Text>
-              <Text style={styles.tableLabel}>₹1200</Text>
-            </View>
-            <View style={styles.subExtraDetails}>
-              <Text style={styles.tableSubLabel}>Current Monthly Refunds</Text>
-              <Text style={[styles.tableLabel, { color: "green" }]}>₹3000</Text>
-            </View>
-            <View style={styles.subExtraDetails}>
-              <Text style={styles.tableSubLabel}>Net Value</Text>
-              <Text style={styles.tableLabel}>
+      {!loadScreen && dashBoardDetails ? (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <LinearGradient
+            colors={["#0516D3", "#D21084"]}
+            start={{ x: 0, y: 0 }} // Left
+            end={{ x: 1, y: 0 }}
+            style={styles.firstContainer}
+          >
+            <View>
+              <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
+              <Text style={styles.totalAmount}>
                 ₹
                 {dashBoardDetails.investedAmount +
                   dashBoardDetails.returnsAmount}
               </Text>
+              <Text style={styles.readLabel}>Ready to withdraw anytime</Text>
+            </View>
+            <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
+              <Ionicons name="wallet-outline" size={20} color={"white"} />
+              <Text style={styles.withdrawBtnLabel}>withdraw</Text>
+            </Pressable>
+          </LinearGradient>
+          <View style={styles.secMainContainer}>
+            <View style={styles.secContainer}>
+              <View style={styles.firstBox}>
+                <Text style={styles.label}>Months Enrolled</Text>
+                <Ionicons name="calendar-outline" size={20} color="#000" />
+              </View>
+              <View style={styles.firstSubBox}>
+                <Text style={styles.numLabel}>1</Text>
+                <Text style={styles.infoLabel}>
+                  Active since {formatDate(dashBoardDetails.joinedOn)}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.secSubContainer}>
+              <View style={styles.firstBox}>
+                <Text style={styles.secSublabel}>Total Paid</Text>
+                <Ionicons name="wallet-outline" size={20} color="white" />
+              </View>
+              <View style={styles.firstSubBox}>
+                <Text style={styles.secNumLabel}>
+                  ₹{dashBoardDetails.investedAmount}
+                </Text>
+                <Text style={styles.secInfoLabel}>
+                  ₹1200 per month (average)
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-
-        <View
-          style={{
-            padding: 10,
-            backgroundColor: "#FFFFFF",
-            borderRadius: 13,
-            marginVertical: 10,
-          }}
-        >
-          <View
+          <Pressable
+            onPress={handleShowReferForm}
             style={{
+              padding: 10,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
+              backgroundColor: "#FCC92F",
+              borderRadius: 13,
+              marginVertical: 10,
             }}
           >
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color={themeColor.BLUE_CLR}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="chatbubble-ellipses-outline" size={30} />
+              <Text style={{ marginLeft: 10, fontWeight: "600", fontSize: 14 }}>
+                Message & Refer
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={30} />
+          </Pressable>
+          <View
+            style={{
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 13,
+              backgroundColor: "white",
+              borderColor: "#dbe3e7ff",
+            }}
+          >
+            <View style={styles.overViewContainer}>
+              <View style={{ width: width * 0.4 }}>
+                <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                  Subscription Overview
+                </Text>
+                <Text>Your Money growth and returns over time</Text>
+              </View>
+              <Pressable style={styles.nanReturnBtn}>
+                <Image
+                  source={require("../../../assets/Arrow.png")}
+                  style={{
+                    width: width * 0.08,
+                    height: height * 0.03,
+                    resizeMode: "stretch",
+                  }}
+                />
+                <Text style={styles.nanReturnLabel}>
+                  {" "}
+                  + {((currentReturns / currentInvested) * 100).toFixed(0)}%
+                  Returns
+                </Text>
+              </Pressable>
+            </View>
+            <View style={styles.viewContainer}>
+              <Pressable
+                onPress={handleTable}
+                style={[
+                  styles.box,
+                  { backgroundColor: isTable ? "white" : null },
+                ]}
+              >
+                <Text style={styles.viewTypeLabel}>Table View</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleChart}
+                style={[
+                  styles.box,
+                  { backgroundColor: isChart ? "white" : null },
+                ]}
+              >
+                <Text style={styles.viewTypeLabel}>Chart View</Text>
+              </Pressable>
+            </View>
+            {isTable ? (
+              <View style={{ width: "100%" }}>
+                <View style={styles.tableViewBox}>
+                  <Text style={[styles.tableLabel, { width: "13%" }]}>
+                    MONTH
+                  </Text>
+                  <Text style={[styles.tableLabel, { width: "18%" }]}>
+                    SUBSCRIPTION
+                  </Text>
+                  <Text style={[styles.tableLabel, { width: "25%" }]}>
+                    PREMIUM SERVICES PROVIDED
+                  </Text>
+                  <Text style={[styles.tableLabel, { width: "15%" }]}>
+                    EXPECTED REFUND
+                  </Text>
+                  <Text style={[styles.tableLabel, { width: "12%" }]}>
+                    RECEIPT
+                  </Text>
+                </View>
+                {chartData.map((item, indx) => (
+                  <View style={styles.dataListContainer} key={indx}>
+                    <Text style={[styles.tableLabel, { width: "13%" }]}>
+                      {item.month}
+                    </Text>
+                    <Text style={[styles.tableLabel, { width: "18%" }]}>
+                      {item.invested}
+                    </Text>
+                    <Text style={[styles.tableLabel, { width: "25%" }]}>
+                      ₹2000
+                    </Text>
+                    <Text style={[styles.tableLabel, { width: "15%" }]}>
+                      ₹3000{/* {item.returns} */}
+                    </Text>
+                    <Ionicons
+                      onPress={() => generateReceipt(item)}
+                      name="download-outline"
+                      size={24}
+                      color={"#33A800"}
+                      style={{ width: "12%" }}
+                    />
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={{ paddingBottom: 20 }}>
+                  <BarChart
+                    stackData={stackedData}
+                    barWidth={barWidth}
+                    barBorderRadius={8}
+                    noOfSections={noOfSections}
+                    maxValue={maxValue}
+                    spacing={spacing}
+                    yAxisThickness={0}
+                    yAxisLabelTexts={yAxisLabelTexts}
+                    showValuesAsTopLabel={false}
+                    showYAxisIndices={false}
+                    hideRules
+                    isAnimated
+                    showLegend={true}
+                    onPress={handleBarPress} // ✅ Only item & index
+                  />
+
+                  {selectedBar && (
+                    <Animated.View
+                      style={[
+                        styles.tooltip,
+                        {
+                          transform: [
+                            { translateX: tooltipPosition.x },
+                            { translateY: tooltipPosition.y },
+                          ],
+                        },
+                      ]}
+                    >
+                      <Text style={styles.tooltipTitle}>
+                        {selectedBar.label}
+                      </Text>
+                      {selectedBar.stacks.map((s, i) => (
+                        <Text key={i} style={{ color: s.color }}>
+                          {s.label}: ₹{s.value}
+                        </Text>
+                      ))}
+                    </Animated.View>
+                  )}
+                </View>
+              </ScrollView>
+            )}
+            <View
               style={{
-                padding: 10,
-                backgroundColor: themeColor.BORDER_CLR,
-                borderRadius: 13,
+                marginVertical: 10,
+                borderWidth: 1,
+                borderColor: themeColor.BORDER_CLR,
               }}
             />
-            <View style={{ width: width*0.35 }}>
-              <Text style={styles.subLabel}>Next Payment Due</Text>
-              <Text style={styles.nextPayLabel}>
-                Your upcoming Subscription Payment
-              </Text>
-            </View>
-            <Pressable onPress={generateQrCode} style={styles.payNowBtn}>
-              <Ionicons name="wallet-outline" size={20} color="white" />
-              <Text style={{ marginLeft: 3, color: "white" }}>Pay now</Text>
-            </Pressable>
-          </View>
-          <View style={styles.paymentContainer}>
-            <View>
-              <Text style={styles.nextPayLabel}>Due Date</Text>
-              <Text style={styles.subLabel}>{getDisplayDate(nextDueDate)}</Text>
-            </View>
-            <View>
-              <Text style={styles.nextPayLabel}>Amount Due</Text>
-              <Text style={styles.subLabel}>
-                ₹{nextDueAmount.toLocaleString("en-IN")}
-              </Text>
-            </View>
-            <View>
-              <Text style={styles.nextPayLabel}>Expected Return</Text>
-              <Text style={styles.subLabel}>
-                {" "}
-                ₹{MONTHLY_RETURN.toLocaleString("en-IN")}
-              </Text>
+            <View style={styles.extraDetails}>
+              <View style={styles.subExtraDetails}>
+                <Text style={styles.tableSubLabel}>Monthly Membership Fee</Text>
+                <Text style={styles.tableLabel}>₹1200</Text>
+              </View>
+              <View style={styles.subExtraDetails}>
+                <Text style={styles.tableSubLabel}>
+                  Current Monthly Refunds
+                </Text>
+                <Text style={[styles.tableLabel, { color: "green" }]}>
+                  ₹3000
+                </Text>
+              </View>
+              <View style={styles.subExtraDetails}>
+                <Text style={styles.tableSubLabel}>Net Value</Text>
+                <Text style={styles.tableLabel}>
+                  ₹
+                  {dashBoardDetails.investedAmount +
+                    dashBoardDetails.returnsAmount}
+                </Text>
+              </View>
             </View>
           </View>
-          <View style={styles.paymentSubContainer}>
-            <View style={{ width: width * 0.5 }}>
-              <Text>Auto-debit scheduled</Text>
-              <Text>
-                Payment will be automatically processed on the due date
-              </Text>
+
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 13,
+              marginVertical: 10,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color={themeColor.BLUE_CLR}
+                style={{
+                  padding: 10,
+                  backgroundColor: themeColor.BORDER_CLR,
+                  borderRadius: 13,
+                }}
+              />
+              <View style={{ width: width * 0.35 }}>
+                <Text style={styles.subLabel}>Next Payment Due</Text>
+                <Text style={styles.nextPayLabel}>
+                  Your upcoming Subscription Payment
+                </Text>
+              </View>
+              <Pressable onPress={generateQrCode} style={styles.payNowBtn}>
+                <Ionicons name="wallet-outline" size={20} color="white" />
+                <Text style={{ marginLeft: 3, color: "white" }}>Pay now</Text>
+              </Pressable>
             </View>
-            <Pressable style={styles.activeBtn}>
-              <Text>Active</Text>
-            </Pressable>
+            <View style={styles.paymentContainer}>
+              <View>
+                <Text style={styles.nextPayLabel}>Due Date</Text>
+                <Text style={styles.subLabel}>
+                  {getDisplayDate(nextDueDate)}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.nextPayLabel}>Amount Due</Text>
+                <Text style={styles.subLabel}>
+                  ₹{nextDueAmount.toLocaleString("en-IN")}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.nextPayLabel}>Expected Return</Text>
+                <Text style={styles.subLabel}>
+                  {" "}
+                  ₹{MONTHLY_RETURN.toLocaleString("en-IN")}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.paymentSubContainer}>
+              <View style={{ width: width * 0.5 }}>
+                <Text>Auto-debit scheduled</Text>
+                <Text>
+                  Payment will be automatically processed on the due date
+                </Text>
+              </View>
+              <Pressable style={styles.activeBtn}>
+                <Text>Active</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <ActivityIndicator
+          size={"large"}
+          color={"blue"}
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        />
+      )}
       <Modal visible={showQrCode}>
         <PaymentModal
           closeModal={setShowQrCode}
@@ -579,13 +643,13 @@ const styles = StyleSheet.create({
     color: "white",
     marginLeft: 5,
   },
-  totalAmount:{
+  totalAmount: {
     fontWeight: "600",
     fontSize: 25,
     color: "white",
     marginLeft: 5,
   },
-  readLabel:{
+  readLabel: {
     fontWeight: "500",
     fontSize: 12,
     color: "white",
@@ -659,7 +723,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     flexDirection: "row",
     alignItems: "center",
-    width: width*0.4
+    width: width * 0.4,
   },
   nanReturnLabel: {
     fontWeight: "600",
@@ -752,7 +816,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 13,
-    paddingHorizontal:10
+    paddingHorizontal: 10,
   },
   paymentContainer: {
     marginVertical: 10,
@@ -776,8 +840,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#B5FFA8",
     borderRadius: 13,
   },
-  tableSubLabel:{
-    fontWeight:"600",
-    fontSize:10
-  }
+  tableSubLabel: {
+    fontWeight: "600",
+    fontSize: 10,
+  },
 });

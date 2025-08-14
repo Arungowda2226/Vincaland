@@ -12,12 +12,15 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
-import axios from "axios";
 import API from "../apidetails/Api";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/userSlice";
 
 const { width } = Dimensions.get("window");
 
-const Register = ({ onSwitchToLogin }) => {
+const Register = ({ onSwitchToLogin, navigation }) => {
+    const dispatch = useDispatch();
+  
   const [isChecked, setChecked] = useState(false);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
@@ -30,6 +33,8 @@ const Register = ({ onSwitchToLogin }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const otpRefs = useRef([]);
 
@@ -38,24 +43,39 @@ const Register = ({ onSwitchToLogin }) => {
   }, [otpDigits]);
 
   const handleAddPhone = () => {
+    const trimmedPhone = phone.trim();
+
+    // ✅ Validate phone number length
+    if (trimmedPhone.length !== 10 || !/^\d+$/.test(trimmedPhone)) {
+      return Alert.alert(
+        "Invalid Phone",
+        "Please enter a valid 10-digit number"
+      );
+    }
+
     setShowAddPhoneModal(true);
-    console.log(`${API}/otp/sendOtp`, "thisIsSendOtp");
+
+    console.log(`${API}/otp/sendOtp`, "Sending OTP...");
 
     fetch(`${API}/otp/sendOtp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        phoneNumber: phone,
-      }),
+      body: JSON.stringify({ phoneNumber: trimmedPhone }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Response:", data);
+        console.log("OTP Response:", data);
+        if (data.error) {
+          Alert.alert("Error", data.message || "Failed to send OTP");
+        } else {
+          Alert.alert("Success", "OTP sent successfully!");
+        }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Error sending OTP:", error);
+        Alert.alert("Network Error", "Could not send OTP. Please try again.");
       });
   };
 
@@ -77,57 +97,99 @@ const Register = ({ onSwitchToLogin }) => {
     }
   };
 
-  const handleSignIn = () => {
-    const showAlert = (title, message) => Alert.alert(title, message);
+const handleSignIn = () => {
+  console.log(`${API}/investors/register`, "thisIsError");
 
-    // Trim values to avoid accidental spaces
-    const trimmedName = name?.trim();
-    const trimmedEmail = email?.trim();
-    const trimmedPhone = phone?.trim();
-    const trimmedPassword = password?.trim();
-    const trimmedConfirmPassword = confirmPassword?.trim();
+  const showAlert = (title, message) => Alert.alert(title, message);
 
-    // Validation checks
+  const trimmedName = name?.trim();
+  const trimmedEmail = email?.trim();
+  const trimmedPhone = phone?.trim();
+  const trimmedPassword = password?.trim();
+  const trimmedConfirmPassword = confirmPassword?.trim();
 
-    if (
-      !trimmedName ||
-      !trimmedEmail ||
-      !trimmedPhone ||
-      !trimmedPassword ||
-      !trimmedConfirmPassword
-    ) {
-      return showAlert("Missing Fields", "Please fill in all fields");
-    }
+  // ✅ Validations
+  if (
+    !trimmedName ||
+    !trimmedEmail ||
+    !trimmedPhone ||
+    !trimmedPassword ||
+    !trimmedConfirmPassword
+  ) {
+    return showAlert("Missing Fields", "Please fill in all fields");
+  }
 
-    if (trimmedPassword !== trimmedConfirmPassword) {
-      return showAlert("Password Mismatch", "Passwords do not match");
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmedEmail)) {
+    return showAlert("Invalid Email", "Please enter a valid email address");
+  }
 
-    if (!isChecked) {
-      return showAlert(
-        "Terms & Conditions Required",
-        "Please read and accept the Terms & Conditions before proceeding."
-      );
-    }
+  if (!/^\d{10}$/.test(trimmedPhone)) {
+    return showAlert("Invalid Phone", "Please enter a valid 10-digit number");
+  }
 
-    // API request
-    axios
-      .post(`${API}/investors/register`, {
-        name: trimmedName,
-        emailId: trimmedEmail,
-        password: trimmedPassword,
-        phoneNumber: trimmedPhone,
-      })
-      .then((res) => {
-        console.log("User registered:", res.data);
-        showAlert("Success", "Account created successfully");
-        navigation.navigate("Home", { userDetails: res.data.investor });
-      })
-      .catch((err) => {
-        console.error("Registration error:", err);
-        showAlert("Error", "Failed to create account");
-      });
+  if (trimmedPassword !== trimmedConfirmPassword) {
+    return showAlert("Password Mismatch", "Passwords do not match");
+  }
+
+  if (trimmedPassword.length < 6) {
+    return showAlert(
+      "Weak Password",
+      "Password must be at least 6 characters"
+    );
+  }
+
+  if (!isPhoneVerified) {
+    return showAlert(
+      "Phone Not Verified",
+      "Please verify your phone number before creating an account."
+    );
+  }
+
+  if (!isChecked) {
+    return showAlert(
+      "Terms & Conditions Required",
+      "Please read and accept the Terms & Conditions before proceeding."
+    );
+  }
+
+  const bodyData = {
+    name: trimmedName,
+    emailId: trimmedEmail,
+    password: trimmedPassword,
+    phoneNumber: trimmedPhone,
   };
+
+  fetch(`${API}/investors/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("User registered response:", data);
+
+      if (data.error) {
+        // ✅ Handle server-side error (duplicate email, etc.)
+        return showAlert("Error", data.error || "Registration failed");
+      }
+
+      // ✅ Success case
+      showAlert("Success", "Account created successfully");
+      dispatch(setUser(data.investor));
+      navigation.navigate("Main", {
+        screen: "Home",
+        params: { userDetails: data.investor },
+      });
+    })
+    .catch((err) => {
+      console.log("Fetch error:", err);
+      showAlert("Error", "Something went wrong. Please try again later.");
+    });
+};
+
 
   const handleVerfityOtp = () => {
     const otpCode = otpDigits.join(""); // Combine digits into one string
@@ -232,8 +294,16 @@ const Register = ({ onSwitchToLogin }) => {
             placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            style={{ flex: 1 }}
           />
-          <Ionicons name={"eye"} size={20} />
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={20}
+              color="gray"
+            />
+          </Pressable>
         </View>
       </View>
       <View style={styles.inputContainer}>
@@ -243,8 +313,18 @@ const Register = ({ onSwitchToLogin }) => {
             placeholder="Re-enter your password"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            style={{ flex: 1 }}
           />
-          <Ionicons name={"eye"} size={20} />
+          <Pressable
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <Ionicons
+              name={showConfirmPassword ? "eye-off" : "eye"}
+              size={20}
+              color="gray"
+            />
+          </Pressable>
         </View>
       </View>
       <View style={styles.checkBoxContainer}>
@@ -282,7 +362,7 @@ const Register = ({ onSwitchToLogin }) => {
             />
             <Text style={styles.infoLabel}>Enter OTP Code</Text>
             <Text style={{ textAlign: "center", marginBottom: 10 }}>
-              Enter the code sent to mail to reset your password.
+              Enter the code sent to your phone to verify your phone number.
             </Text>
             <View style={styles.otpContainer}>
               {otpDigits.map((digit, index) => (

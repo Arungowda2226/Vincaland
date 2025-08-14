@@ -80,7 +80,7 @@ export default function Login({navigation}) {
             </Pressable>
           </View>
           {showLogin && <LoginScreen onSwitchToSignin={handleSignUp} />}
-          {showReg && <Register onSwitchToLogin={handleLogin} />}
+          {showReg && <Register onSwitchToLogin={handleLogin} navigation={navigation}/>}
         </View>
       </View>
       <LinearGradient

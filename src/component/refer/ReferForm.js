@@ -136,13 +136,21 @@ export default ReferForm;
 
 const styles = StyleSheet.create({
   input: {
-    padding: 10,
+    width: "100%",                
+    minHeight: 48,               
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     backgroundColor: "#FFFFFF",
-    borderRadius: 13,
-    marginVertical: 10,
-    borderColor: "#00000078",
+    borderWidth: 1,             
+    borderRadius: 12,
+    marginVertical: 8,
+    borderColor: "#ccc",         
+    fontSize: 16,
+    color: "#000",
   },
   textArea: {
     height: 120,
+    textAlignVertical: "top",     
   },
 });
+

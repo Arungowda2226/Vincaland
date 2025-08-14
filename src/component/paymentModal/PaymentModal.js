@@ -193,7 +193,7 @@ export default PaymentModal;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  main: { flex: 1, padding: 24 },
+  main: { padding: 24 },
   qrContainer: { marginVertical: 30, alignItems: "center", backgroundColor: "#fff", padding: 10, borderRadius: 10 },
   noteText: {
     marginTop: 15,

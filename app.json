@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "splash": {
@@ -23,7 +23,6 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.sanketh99.vincaland"
@@ -48,15 +47,14 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "extra": {
       "eas": {
-        "projectId": "b7a771ce-5ca6-4274-afec-44ac12a7c5e6"
+        "projectId": "c6c81504-ec4a-4bde-8ccf-5efbe42693a8"
       }
     },
-    "updates": {
-      "url": "https://u.expo.dev/b7a771ce-5ca6-4274-afec-44ac12a7c5e6"
-    }
+    "owner": "sanketh99"
   }
 }
