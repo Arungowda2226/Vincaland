@@ -66,28 +66,32 @@ const PaymentModal = ({ closeModal, onPaymentSuccess }) => {
   // ✅ UTR Validation
   const validateUTR = (utr) => /^[a-zA-Z0-9]{12}$/.test(utr);
 
-  const confirmPaymentCompletion = () => {
-    if (!validateUTR(utrNumber)) {
-      setUtrError("Invalid UTR. Must be 12 characters.");
-      return;
-    }
+const confirmPaymentCompletion = () => {
+  if (!validateUTR(utrNumber)) {
+    setUtrError("Invalid UTR. Must be 12 characters.");
+    return;
+  }
 
-    setUtrError("");
-    setIsPaying(true);
+  setUtrError("");
+  setIsPaying(true);
 
-    fetch(`${API}/payments/paymentUpdate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        paymentAmount: amountToPay,
-        transactionId: utrNumber,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+  fetch(`${API}/payments/paymentUpdate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      paymentAmount: amountToPay,
+      transactionId: utrNumber,
+    }),
+  })
+    .then(async (res) => {
+      const data = await res.json();
+      console.log(data, "thisIsDataPayment");
+
+      if (res.ok && !data.error) {
+        // ✅ Success case
         Alert.alert(
           "Payment Submitted",
           "Your payment is done. Amount will be credited to your wallet within 30 minutes.",
@@ -101,13 +105,18 @@ const PaymentModal = ({ closeModal, onPaymentSuccess }) => {
             },
           ]
         );
-      })
-      .catch((err) => {
-        console.log(err, "thisIsError");
-        Alert.alert("Error", "Something went wrong. Please try again.");
-      })
-      .finally(() => setIsPaying(false));
-  };
+      } else {
+        // ❌ Error from backend
+        Alert.alert("Error", data.error || "Payment failed. Try again.");
+      }
+    })
+    .catch((err) => {
+      console.log(err, "thisIsError");
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    })
+    .finally(() => setIsPaying(false));
+};
+
 
   return (
     <View style={styles.container}>

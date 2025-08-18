@@ -71,7 +71,6 @@ const Register = ({ onSwitchToLogin, navigation }) => {
           Alert.alert("Error", data.message || "Failed to send OTP");
         } else {
           Alert.alert("Success", "OTP sent successfully!");
-          setShowAddPhoneModal(false);
         }
       })
       .catch((error) => {
@@ -191,7 +190,6 @@ const handleSignIn = () => {
     });
 };
 
-
 const handleVerfityOtp = () => {
   const otpCode = otpDigits.join(""); // Combine digits into one string
 
@@ -233,8 +231,6 @@ const handleVerfityOtp = () => {
       Alert.alert("Network Error", "Failed to verify OTP. Please try again.");
     });
 };
-
-
 
   const handleSignUp = () => {
     onSwitchToLogin();

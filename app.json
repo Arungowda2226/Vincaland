@@ -23,9 +23,10 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
+        "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.sanketh99.vincaland"
+      "package": "com.arungowda22.vincaland"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -52,9 +53,11 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "c6c81504-ec4a-4bde-8ccf-5efbe42693a8"
+        "projectId": "078aefd9-7059-4757-9f61-895dd9fa78d8"
       }
     },
-    "owner": "sanketh99"
+    "updates": {
+      "url": "https://u.expo.dev/078aefd9-7059-4757-9f61-895dd9fa78d8"
+    }
   }
 }

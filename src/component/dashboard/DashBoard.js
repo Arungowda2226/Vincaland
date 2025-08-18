@@ -9,6 +9,7 @@ import {
   Animated,
   Modal,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Header from "../header/Header";
@@ -21,8 +22,6 @@ import PaymentModal from "../paymentModal/PaymentModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReferForm from "../refer/ReferForm";
 import WithdrawnModal from "../withdrawn/WithdrawnModal";
-import * as Print from "expo-print";
-import * as Sharing from "expo-sharing";
 
 const { width, height } = Dimensions.get("window");
 
@@ -46,7 +45,6 @@ const DashBoard = ({ navigation, route }) => {
   const tooltipPosition = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   useEffect(() => {
-    console.log(userDetails, "thisIsUserDetails");
     if (userDetails) {
       AsyncStorage.setItem("token", userDetails.token);
       getDashBoardDetails();
@@ -114,12 +112,10 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "data");
         setDashBoardDetails(data);
         setLoadScreen(false);
       })
       .catch((err) => {
-        console.log(err);
         setLoadScreen(false);
       });
   };
@@ -134,20 +130,14 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "thisPayment");
-
         setPaymentInfos(data.paymentInfos);
+        console.log(data.paymentInfos, "thisIsAllPayment");
         // const verifiedPayments = data.paymentInfos.filter(
         //   (payment) => payment.isVerified === true
         // );
-
-        // console.log(verifiedPayments, "payment (verified only)");
-
         // setPaymentInfos(verifiedPayments);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
   };
 
   function calculateDurationInMonths(joinedOn) {
@@ -221,6 +211,8 @@ const DashBoard = ({ navigation, route }) => {
         month: getMonthFromDate(date),
         invested: paymentData.paymentAmount ?? 2200,
         returns: calculateReturns(paymentInfos.slice(0, index)),
+        transactionId: paymentData.transactionId,
+        verified: paymentData.isVerified,
         colorInvested: "#5D17EB",
         colorReturns: "#03AC13",
       };
@@ -272,6 +264,33 @@ const DashBoard = ({ navigation, route }) => {
       chartData,
       dashBoardDetails,
     });
+  };
+
+  const verifyPayment = async (paymentId) => {
+    console.log(paymentId, "verifying");
+    if (!paymentId) {
+      alert("⚠️ Please create a payment first.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/payments/verify-payment/${paymentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ " + data.message);
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error verifying payment.");
+    }
   };
 
   return (
@@ -416,12 +435,19 @@ const DashBoard = ({ navigation, route }) => {
                   <Text style={[styles.tableLabel, { width: "15%" }]}>
                     EXPECTED REFUND
                   </Text>
+                  <Text style={[styles.tableLabel, { width: "15%" }]}>
+                    VERIFIED
+                  </Text>
                   <Text style={[styles.tableLabel, { width: "12%" }]}>
                     RECEIPT
                   </Text>
                 </View>
                 {chartData.map((item, indx) => (
-                  <View style={styles.dataListContainer} key={indx}>
+                  <View
+                    // onPress={() => verifyPayment(item.transactionId)}
+                    style={styles.dataListContainer}
+                    key={indx}
+                  >
                     <Text style={[styles.tableLabel, { width: "13%" }]}>
                       {item.month}
                     </Text>
@@ -434,11 +460,36 @@ const DashBoard = ({ navigation, route }) => {
                     <Text style={[styles.tableLabel, { width: "15%" }]}>
                       ₹3000{/* {item.returns} */}
                     </Text>
+                    {item.verified ? (
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={24}
+                        color={"#33A800"}
+                        style={{ width: "12%" }}
+                      />
+                    ) : (
+                      <Ionicons
+                        name="close-circle"
+                        size={24}
+                        color={"#FF0000"}
+                        style={{ width: "12%" }}
+                      />
+                    )}
                     <Ionicons
-                      onPress={() => generateReceipt(item)}
+                      onPress={() => {
+                        if (item.verified) {
+                          generateReceipt(item);
+                        } else {
+                          Alert.alert(
+                            "Payment Pending",
+                            "Your payment is still under admin verification. You will be able to download the receipt once it’s approved.",
+                            [{ text: "OK", style: "default" }]
+                          );
+                        }
+                      }}
                       name="download-outline"
                       size={24}
-                      color={"#33A800"}
+                      color={item.verified ? "#33A800" : "#999"}
                       style={{ width: "12%" }}
                     />
                   </View>
@@ -748,8 +799,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 12,
     color: "#2415C7",
-    textAlign:"left",
-    width:"auto",
+    textAlign: "left",
+    width: "auto",
     // backgroundColor:"red"
   },
   viewContainer: {
