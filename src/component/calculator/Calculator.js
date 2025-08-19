@@ -107,7 +107,7 @@ const Calculator = ({ navigation }) => {
               maximumValue={20}
               step={0.1}
               value={interestRate}
-              onValueChange={setInterestRate}
+              onValueChange={(val) => setInterestRate(Number(val.toFixed(1)))}
               minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
@@ -175,7 +175,7 @@ const Calculator = ({ navigation }) => {
               maximumValue={15}
               step={0.1}
               value={inflationRate}
-              onValueChange={setInflationRate}
+              onValueChange={(val) => setInflationRate(Number(val.toFixed(1)))}
               minimumTrackTintColor="#F62888"
               maximumTrackTintColor="#1BD0C7"
               thumbTintColor="#FFADD3"
