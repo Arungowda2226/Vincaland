@@ -140,7 +140,7 @@ const Home = ({ navigation, route }) => {
         >
           <View style={styles.rowSpaceBetween}>
             <View style={styles.subscribeTextContainer}>
-              <Text>Lat’s Start Now!</Text>
+              <Text>Let’s Start Now!</Text>
               <View style={styles.subscribeButton}>
                 <Text style={styles.subscribeButtonText}>
                   Subscribe Now & Never Miss Out!
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   loanContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#31E100",
+    backgroundColor: "#006DD0",
     borderRadius: 13,
     alignSelf: "flex-start",
     marginBottom: 10,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   dashBoardContainer: {
-    backgroundColor: "#CB2DFB",
+    backgroundColor: "#006DD0",
     borderBottomLeftRadius: 30,
     borderRadius: 10,
     alignSelf: "flex-start",

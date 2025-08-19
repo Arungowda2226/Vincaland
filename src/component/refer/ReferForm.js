@@ -1,6 +1,7 @@
 import {
   Alert,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -95,7 +96,7 @@ const ReferForm = ({ closeModal, userDetails, route }) => {
         closeModal={closeModal}
         navigation={navigation}
       />
-      <View style={{ flex: 1, padding: 24 }}>
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
         <View style={styles.container}>
           <Text style={styles.mainLabel}>Enter Name :</Text>
           <TextInput
@@ -132,7 +133,6 @@ const ReferForm = ({ closeModal, userDetails, route }) => {
 
         <View style={styles.container}>
           <Text style={styles.mainLabel}>Enter Message :</Text>
-
           <TextInput
             placeholder="Enter Message"
             style={[styles.input, styles.textArea]}
@@ -159,7 +159,7 @@ const ReferForm = ({ closeModal, userDetails, route }) => {
             Submit
           </Text>
         </Pressable>
-      </View>
+      </ScrollView>
     </View>
   );
 };

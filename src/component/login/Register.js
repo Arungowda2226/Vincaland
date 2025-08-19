@@ -317,6 +317,7 @@ const handleVerfityOtp = () => {
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
             style={{ flex: 1 }}
+            placeholderTextColor={"black"}
           />
           <Pressable
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}

@@ -1,14 +1,121 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { FlatList, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
 import { Ionicons } from "@expo/vector-icons";
+import API from "../apidetails/Api";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/userSlice";
 
 const PaymentHistory = ({ navigation }) => {
-  const PaymentHistoryData = [
-    { id: 1, time: "Jun 18 . 16:02 pm" },
-    { id: 2, time: "May 12 . 11:04 am" },
-    { id: 3, time: "March 28 . 12:04 am" },
-  ];
+
+  const [dashBoardDetails, setDashBoardDetails] = useState({});
+  const [payments, setPayments] = useState([]);
+
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (user) {
+      getPaymentDetails();
+      getDashBoardDetails();
+    }
+  }, [user]);
+
+  const getPaymentDetails = () => {
+    console.log(user, "thisIsUsers");
+    fetch(`${API}/payments/getByEmail`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setPayments(data?.paymentInfos);
+      });
+  };
+
+  const getDashBoardDetails = () => {
+    fetch(`${API}/investors/findByEmail`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDashBoardDetails(data);
+      })
+      .catch((err) => {});
+  };
+
+  const calculateNextDueDate = (lastPaymentDate = null) => {
+    const base = lastPaymentDate ? new Date(lastPaymentDate) : new Date();
+    base.setMonth(base.getMonth() + 1);
+    base.setDate(5);
+    return base;
+  };
+
+  const nextDueDate = calculateNextDueDate(
+    dashBoardDetails.lastPaymentDoneOn
+      ? new Date(dashBoardDetails.lastPaymentDoneOn)
+      : null
+  );
+
+
+  function getOrdinalSuffix(day) {
+    if (day > 3 && day < 21) return "th";
+
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  }
+
+  function getDisplayDate(date) {
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "long" });
+
+    const suffix = getOrdinalSuffix(day);
+
+    return `${day}${suffix} ${month}`;
+  }
+
+  const paymentList = ({item, index}) => {
+    if(item?.isVerified) {
+    return(
+      <View style={styles.historyItem}>
+              <View style={styles.iconContainer}>
+                <Image source={require("../../../assets/shear.png")} />
+              </View>
+              <View>
+                <Text style={styles.itemTitle}>Payment Paid successfully.</Text>
+                <Text style={styles.itemDate}>
+                  {getDisplayDate(new Date(item.paymentDate))}
+                </Text>
+              </View>
+              <View style={styles.itemRight}>
+                <Text style={styles.itemAmount}>₹{item.paymentAmount}</Text>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  style={styles.itemArrow}
+                />
+              </View>
+            </View>
+    )
+  } else {
+    return null
+  }
+  }
+
   return (
     <View style={styles.container}>
       <Header title={"Payment History"} navigation={navigation} />
@@ -24,41 +131,29 @@ const PaymentHistory = ({ navigation }) => {
             <Text style={styles.highlightedPrice}>₹1200</Text>/month
           </Text>
           <Text style={styles.dueDate}>
-            Your next subscription installment is due 29 jun 2025
+            Your next subscription installment is due{" "}
+            {getDisplayDate(nextDueDate)}
           </Text>
-          <View style={styles.payNowBtn}>
+          {/* <View style={styles.payNowBtn}>
             <Text style={styles.payNowText}>Pay now</Text>
-          </View>
+          </View> */}
         </View>
 
         {/* History Header */}
         <View style={styles.historyHeader}>
           <Text style={styles.historyTitle}>Referral History</Text>
-          <Ionicons name="search-outline" size={24} />
+          {/* <Ionicons name="search-outline" size={24} /> */}
         </View>
         <View style={styles.historyDivider} />
 
         {/* History List */}
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {PaymentHistoryData.map((item, index) => (
-            <View style={styles.historyItem} key={index}>
-              <View style={styles.iconContainer}>
-                <Image source={require("../../../assets/shear.png")} />
-              </View>
-              <View>
-                <Text style={styles.itemTitle}>Payment Paid successfully.</Text>
-                <Text style={styles.itemDate}>{item.time}</Text>
-              </View>
-              <View style={styles.itemRight}>
-                <Text style={styles.itemAmount}>₹1200</Text>
-                <Ionicons
-                  name="chevron-forward-outline"
-                  style={styles.itemArrow}
-                />
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+        <View style={styles.scrollContainer}>
+          <FlatList
+            data={payments}
+            renderItem={paymentList}
+            keyExtractor={(item,index)=> index.toString()}
+          />
+        </View>
       </View>
     </View>
   );
@@ -113,9 +208,9 @@ const styles = StyleSheet.create({
   historyDivider: {
     borderWidth: 1,
     borderColor: "#DADADA",
-    marginVertical: 10,
+    marginBottom:10,
   },
-  scrollContainer: { paddingVertical: 10 },
+  scrollContainer: { paddingVertical: 10, flex:1 },
   historyItem: {
     padding: 10,
     backgroundColor: "#FFFFFF",
@@ -123,7 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical:10
+    marginVertical: 10,
   },
   iconContainer: {
     backgroundColor: "#E5FBDD",

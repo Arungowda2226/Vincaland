@@ -1,38 +1,44 @@
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import API from "../apidetails/Api";
 
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    photo: "https://randomuser.me/api/portraits/men/1.jpg",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    photo: "https://randomuser.me/api/portraits/women/2.jpg",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    photo: "https://randomuser.me/api/portraits/men/3.jpg",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    photo: "https://randomuser.me/api/portraits/women/4.jpg",
-  },
-  {
-    id: 5,
-    name: "Chris Brown",
-    photo: "https://randomuser.me/api/portraits/men/5.jpg",
-  },
-];
 
 const ReferralHistory = ({ navigation }) => {
+
+  const { user } = useSelector((state) => state.user);
+
+  const [referralHistory, setReferralHistory] = useState([]);
+
+
+ useEffect(() => {
+  if (!user?.phoneNumber) return;
+
+  
+  let phone = user.phoneNumber;
+  // if (phone.startsWith("91")) {
+  //   phone = phone.slice(2);
+  // }
+
+  fetch(`${API}/referral/getByReferrer/${phone}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      setReferralHistory(data.data || []);
+    })
+    .catch((err) => {
+      console.log("Referral fetch error:", err);
+    });
+}, [user]);
+
+
   return (
     <View style={styles.container}>
       <Header title={"Referral History"} navigation={navigation} />
@@ -61,31 +67,31 @@ const ReferralHistory = ({ navigation }) => {
               style={styles.profileImage}
             />
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>Mariya Joseph</Text>
+              <Text style={styles.profileName}>{user?.name}</Text>
               <View style={styles.profileImageBox}>
                 <Ionicons name="call-outline" size={20} color={"#FFFFFF"} />
-                <Text style={styles.profilePhone}>+91 123 456 7890</Text>
+                <Text style={styles.profilePhone}>+{user?.phoneNumber}</Text>
               </View>
             </View>
           </View>
 
-          <View style={[styles.profileImageBox, styles.profileEarnings]}>
+          {/* <View style={[styles.profileImageBox, styles.profileEarnings]}>
             <Ionicons name="star" color={"#EBA81A"} />
             <Text style={styles.earningsText}>
               Referral Earnings{" "}
               <Text style={styles.earningsAmount}>: ₹4000</Text>
             </Text>
-          </View>
+          </View> */}
         </LinearGradient>
 
         {/* Referral History */}
         <View style={styles.historyContainer}>
           <View style={styles.historyHeader}>
             <Text style={styles.historyTitle}>Referral History</Text>
-            <Ionicons name="search-outline" size={24} />
+            {/* <Ionicons name="search-outline" size={24} /> */}
           </View>
           <View style={styles.historyDivider} />
-          {users.map((item, index) => (
+          {referralHistory.map((item, index) => (
             <View style={styles.historyItem} key={index}>
               <Image
                 source={require("../../../assets/dummyprofile.png")}
@@ -123,12 +129,12 @@ const styles = StyleSheet.create({
     fontSize: 8,
     textAlign: "center",
   },
-  profileImageBox: { flexDirection: "row", alignItems: "center" },
+  profileImageBox: { flexDirection: "row", alignItems: "center",marginTop:10  },
   mtNegative: { marginTop: -20 },
   profileImage: { height: 50, width: 50 },
   profileInfo: { marginLeft: 20, marginVertical: 10 },
   profileName: { fontWeight: "500", fontSize: 16, color: "#FFFFFF" },
-  profilePhone: { fontWeight: "500", fontSize: 14, color: "#FFFFFF" },
+  profilePhone: { fontWeight: "500", fontSize: 14, color: "#FFFFFF"},
   profileEarnings: { marginVertical: 10 },
   earningsText: {
     fontWeight: "500",
