@@ -5,8 +5,9 @@ import {
   Image,
   Dimensions,
   Pressable,
-  TouchableOpacity,
   ScrollView,
+  BackHandler,
+  Alert
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +34,31 @@ const Home = ({ navigation, route }) => {
   const receiveNotification = () => {
     setNotificationCount((prev) => prev + 1);
   };
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert("Logout", "Do you want to logout?", [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            navigation.replace("Login"); // navigate to login
+          },
+        },
+      ]);
+      return true; // prevent default back action
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove(); // cleanup
+  }, []);
 
   const handleProfile = () => {
     navigation.openDrawer();
