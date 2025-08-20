@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import Header from "../header/Header";
 
-const WithdrawnModal = ({ closeModal, dashBoardDetails }) => {
+const WithdrawalModal = ({ closeModal, dashBoardDetails }) => {
   return (
     <View style={styles.container}>
-      <Header title="Withdrawn" closeModal={closeModal} />
+      <Header title="Withdrawal" closeModal={closeModal} />
       <View style={styles.content}>
         <Text style={styles.heading}>Withdraw Funds</Text>
 
@@ -20,11 +20,14 @@ const WithdrawnModal = ({ closeModal, dashBoardDetails }) => {
 
         <View style={styles.warningBox}>
           <Text style={styles.warningText}>
-            Withdrawals can only be done after 36 months of first deposit
+            Withdrawal can only be done after 36 months of first deposit
           </Text>
         </View>
 
-        <TouchableOpacity style={[styles.button, styles.disabledButton]} disabled>
+        <TouchableOpacity
+          style={[styles.button, styles.disabledButton]}
+          disabled
+        >
           <Text style={styles.buttonText}>Confirm Withdrawal</Text>
         </TouchableOpacity>
       </View>
@@ -32,7 +35,7 @@ const WithdrawnModal = ({ closeModal, dashBoardDetails }) => {
   );
 };
 
-export default WithdrawnModal;
+export default WithdrawalModal;
 
 const styles = StyleSheet.create({
   container: {

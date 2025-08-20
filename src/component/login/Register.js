@@ -251,7 +251,8 @@ const handleVerfityOtp = () => {
         <Text>Full Name</Text>
         <TextInput
           placeholder="Enter your full name"
-          style={styles.input}
+          style={[styles.input,{color: "#000"}]}
+          placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
         />
@@ -260,7 +261,8 @@ const handleVerfityOtp = () => {
         <Text>Email Address</Text>
         <TextInput
           placeholder="Enter your Email"
-          style={styles.input}
+           style={[styles.input,{color: "#000"}]}
+          placeholderTextColor="#999"
           value={email}
           onChangeText={setEmail}
         />
@@ -276,8 +278,9 @@ const handleVerfityOtp = () => {
         >
           <TextInput
             placeholder="Verify phone number"
-            style={[styles.input, { width: "60%" }]}
+            style={[styles.input, { width: "60%", color: "#000" }]}
             value={phone}
+          placeholderTextColor="#999"
             onChangeText={setPhone}
           />
           <Pressable onPress={handleAddPhone} style={styles.phoneBtn}>
@@ -297,7 +300,8 @@ const handleVerfityOtp = () => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
-            style={{ flex: 1 }}
+            style={{ flex: 1, color: "#000" }}
+            placeholderTextColor="#999"
           />
           <Pressable onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
@@ -316,8 +320,8 @@ const handleVerfityOtp = () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
-            style={{ flex: 1 }}
-            placeholderTextColor={"black"}
+            style={{ flex: 1, color: "#000" }}
+            placeholderTextColor="#999"
           />
           <Pressable
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}

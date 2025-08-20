@@ -7,7 +7,7 @@ import Slider from "@react-native-community/slider";
 
 const calculatorTypeData = [
   { id: 1, type: "EMI calculator" },
-  { id: 2, type: "inflation calculator" },
+  { id: 2, type: "Inflation calculator" },
 ];
 
 const Calculator = ({ navigation }) => {
@@ -145,7 +145,7 @@ const Calculator = ({ navigation }) => {
           </View>
         )}
 
-        {calculatorType === "inflation calculator" && (
+        {calculatorType === "Inflation calculator" && (
           <View style={styles.box}>
             {/* Present Value */}
             <View style={styles.row}>
@@ -257,7 +257,7 @@ const Calculator = ({ navigation }) => {
               </>
             )}
 
-            {calculatorType === "inflation calculator" && futureValue && (
+            {calculatorType === "Inflation calculator" && futureValue && (
               <>
                 <View
                   style={{

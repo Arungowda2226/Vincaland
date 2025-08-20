@@ -62,40 +62,38 @@ export default function LoginScreen({ onSwitchToSignin }) {
   };
 
   const handleSendOtp = async () => {
-  if (!phoneNum) {
-    Alert.alert("Validation", "Enter phone number");
-    return;
-  }
+    if (!phoneNum) {
+      Alert.alert("Validation", "Enter phone number");
+      return;
+    }
 
-  try {
-    const res = await fetch(`${API}/otp/sendOtp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phoneNumber: phoneNum }),
-    });
-    const data = await res.json();
-    console.log("OTP Sent:", data);
-    setShowOtp(true);
-
-    // start countdown
-    setResendAvailable(false);
-    setCountdown(120);
-    let timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setResendAvailable(true);
-          return 0;
-        }
-        return prev - 1;
+    try {
+      const res = await fetch(`${API}/otp/sendOtp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: phoneNum }),
       });
-    }, 1000);
+      const data = await res.json();
+      console.log("OTP Sent:", data);
+      setShowOtp(true);
 
-  } catch (error) {
-    console.error("OTP send error:", error);
-  }
-};
-
+      // start countdown
+      setResendAvailable(false);
+      setCountdown(120);
+      let timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setResendAvailable(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error) {
+      console.error("OTP send error:", error);
+    }
+  };
 
   const handleVerifyOtp = async () => {
     if (!otp) {
@@ -169,7 +167,8 @@ export default function LoginScreen({ onSwitchToSignin }) {
           placeholder="Enter Your Email"
           onChangeText={setEmail}
           value={email}
-          style={styles.input}
+          style={[styles.input, { color: "#000" }]}
+          placeholderTextColor="#999"
           keyboardType="email-address"
         />
       </View>
@@ -182,7 +181,8 @@ export default function LoginScreen({ onSwitchToSignin }) {
             onChangeText={setPassword}
             value={password}
             secureTextEntry={!showEye}
-            style={{ flex: 1 }}
+            style={{ flex: 1, color: "#000"  }}
+            placeholderTextColor="#999"
           />
           <Ionicons
             onPress={toggleEye}
@@ -235,7 +235,8 @@ export default function LoginScreen({ onSwitchToSignin }) {
                 keyboardType="number-pad"
                 onChangeText={setPhoneNum}
                 value={phoneNum}
-                style={{ flex: 1 }}
+                style={{ flex: 1, color: "#000"  }}
+                placeholderTextColor="#999"
               />
             </View>
 
@@ -248,16 +249,26 @@ export default function LoginScreen({ onSwitchToSignin }) {
                     keyboardType="number-pad"
                     onChangeText={setOtp}
                     value={otp}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, color: "#000"  }}
+                    placeholderTextColor="#999"
                   />
                 </View>
 
                 {resendAvailable ? (
-                  <Pressable onPress={handleSendOtp} style={{marginVertical:10, alignSelf:"center"}}>
+                  <Pressable
+                    onPress={handleSendOtp}
+                    style={{ marginVertical: 10, alignSelf: "center" }}
+                  >
                     <Text style={styles.withOtp}>Resend OTP</Text>
                   </Pressable>
                 ) : (
-                  <Text style={{ color: "gray", textAlign: "center", marginBottom:10 }}>
+                  <Text
+                    style={{
+                      color: "gray",
+                      textAlign: "center",
+                      marginBottom: 10,
+                    }}
+                  >
                     Resend in{" "}
                     {Math.floor(countdown / 60)
                       .toString()

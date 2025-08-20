@@ -317,7 +317,7 @@ const DashBoard = ({ navigation, route }) => {
             </View>
             <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
               <Ionicons name="wallet-outline" size={20} color={"white"} />
-              <Text style={styles.withdrawBtnLabel}>withdraw</Text>
+              <Text style={styles.withdrawBtnLabel}>Withdraw</Text>
             </Pressable>
           </LinearGradient>
           <View style={styles.secMainContainer}>
