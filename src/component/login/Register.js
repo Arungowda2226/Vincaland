@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
   Alert,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
@@ -245,7 +246,7 @@ const handleVerfityOtp = () => {
   };
 
   return (
-    <View style={styles.main}>
+    <ScrollView contentContainerStyle={styles.main}>
       <Text style={styles.createLabel}>Create Account</Text>
       <View style={styles.inputContainer}>
         <Text>Full Name</Text>
@@ -468,7 +469,7 @@ const handleVerfityOtp = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -476,7 +477,8 @@ export default Register;
 
 const styles = StyleSheet.create({
   main: {
-    flex: 1,
+   paddingTop:10,
+   paddingBottom:50
   },
   createLabel: {
     textAlign: "center",
