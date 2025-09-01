@@ -13,12 +13,12 @@ import { LinearGradient } from "expo-linear-gradient";
 const subscribPolicy = [
   { id: 1, title: "36 Months returns" },
   { id: 2, title: "A maximum of 5000 investors will be accepted." },
-  { id: 3, title: "2% referral commission per loan" },
-  { id: 4, title: "3% referral commission per person investment." },
-  { id: 5, title: "1.5% referral commission per construction project." },
-  { id: 6, title: "3% referral commission per interiors project." },
-  { id: 7, title: "1% referral commission real estate per transaction" },
-  { id: 8, title: "3% referral commission per CIBIL repair service" },
+  { id: 3, title: "30% referral commission per loan" },
+  { id: 4, title: "30% referral commission per person investment." },
+  { id: 5, title: "30% referral commission per construction project." },
+  { id: 6, title: "30% referral commission per interiors project." },
+  { id: 7, title: "30% referral commission real estate per transaction" },
+  { id: 8, title: "30% referral commission per CIBIL repair service" },
 ];
 
 const referralData = [

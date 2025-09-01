@@ -423,22 +423,22 @@ const DashBoard = ({ navigation, route }) => {
             {isTable ? (
               <View style={{ width: "100%" }}>
                 <View style={styles.tableViewBox}>
-                  <Text style={[styles.tableLabel, { width: "13%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "10%" }]}>
                     MONTH
                   </Text>
-                  <Text style={[styles.tableLabel, { width: "18%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "19%" }]}>
                     SUBSCRIPTION
                   </Text>
-                  <Text style={[styles.tableLabel, { width: "25%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "27%" }]}>
                     PREMIUM SERVICES PROVIDED
                   </Text>
-                  <Text style={[styles.tableLabel, { width: "15%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "17%" }]}>
                     EXPECTED REFUND
                   </Text>
-                  <Text style={[styles.tableLabel, { width: "15%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "10%" }]}>
                     VERIFIED
                   </Text>
-                  <Text style={[styles.tableLabel, { width: "12%" }]}>
+                  <Text style={[styles.tableTextLabel, { width: "10%" }]}>
                     RECEIPT
                   </Text>
                 </View>
@@ -454,10 +454,10 @@ const DashBoard = ({ navigation, route }) => {
                     <Text style={[styles.tableLabel, { width: "18%" }]}>
                       {item.invested}
                     </Text>
-                    <Text style={[styles.tableLabel, { width: "25%" }]}>
+                    <Text style={[styles.tableLabel, { width: "26%" }]}>
                       ₹2000
                     </Text>
-                    <Text style={[styles.tableLabel, { width: "15%" }]}>
+                    <Text style={[styles.tableLabel, { width: "17%" }]}>
                       ₹3000{/* {item.returns} */}
                     </Text>
                     {item.verified ? (
@@ -465,14 +465,14 @@ const DashBoard = ({ navigation, route }) => {
                         name="checkmark-circle"
                         size={24}
                         color={"#33A800"}
-                        style={{ width: "12%" }}
+                        style={{ width: "12%", marginLeft:10 }}
                       />
                     ) : (
                       <Ionicons
                         name="close-circle"
                         size={24}
                         color={"#FF0000"}
-                        style={{ width: "12%" }}
+                        style={{ width: "12%" , marginLeft:10 }}
                       />
                     )}
                     <Ionicons
@@ -831,6 +831,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: "gray",
+  },
+  tableTextLabel:{
+    fontWeight: "500",
+    fontSize: 6,
+    flexWrap: "wrap",
+    color: "#505050",
+    textAlign: "center",
   },
   tableLabel: {
     fontWeight: "500",
