@@ -52,7 +52,7 @@ const DashBoard = ({ navigation, route }) => {
     }
   }, [userDetails]);
 
-  const stackedData = chartData.map((item) => {
+  const stackedData = chartData?.map((item) => {
     const stacks = [];
     if (item.invested)
       stacks.push({
@@ -67,7 +67,7 @@ const DashBoard = ({ navigation, route }) => {
 
   // Dynamic scaling
   const maxStackValue = Math.max(
-    ...stackedData.map((d) => d.stacks.reduce((sum, s) => sum + s.value, 0))
+    ...stackedData?.map((d) => d.stacks.reduce((sum, s) => sum + s.value, 0))
   );
   const maxValue = Math.ceil(maxStackValue / 1000) * 1000;
   const noOfSections = 6;
@@ -130,34 +130,51 @@ const DashBoard = ({ navigation, route }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setPaymentInfos(data.paymentInfos);
-        console.log(data.paymentInfos, "thisIsAllPayment");
-        // const verifiedPayments = data.paymentInfos.filter(
-        //   (payment) => payment.isVerified === true
-        // );
-        // setPaymentInfos(verifiedPayments);
+          console.log(data, "thisIsAllPayment");
+
+        if (data && Array.isArray(data.paymentInfos)) {
+          setPaymentInfos(data.paymentInfos);
+          console.log(data.paymentInfos, "thisIsAllPayment");
+          // const verifiedPayments = data.paymentInfos.filter(
+          //   (payment) => payment.isVerified === true
+          // );
+          // setPaymentInfos(verifiedPayments);
+        } else {
+          console.warn("paymentInfos is missing or not an array:", data);
+          setPaymentInfos([]); // Set to empty array to avoid crashing
+        }
       })
       .catch((err) => {});
   };
 
   function calculateDurationInMonths(joinedOn) {
-    const now = new Date();
+    if (joinedOn instanceof Date && !isNaN(joinedOn)) {
+      const now = new Date();
 
-    const yearsDiff = now.getFullYear() - joinedOn.getFullYear();
-    const monthsDiff = now.getMonth() - joinedOn.getMonth();
+      const yearsDiff = now.getFullYear() - joinedOn.getFullYear();
+      const monthsDiff = now.getMonth() - joinedOn.getMonth();
 
-    const totalMonths = yearsDiff * 12 + monthsDiff;
+      const totalMonths = yearsDiff * 12 + monthsDiff;
 
-    // add +1 if you want the duration to be inclusive of the start month
-    return totalMonths + 1;
+      // add +1 if you want the duration to be inclusive of the start month
+      return totalMonths + 1;
+    } else {
+      return 0;
+    }
   }
 
-  const monthsBeenMember = calculateDurationInMonths(
-    new Date(dashBoardDetails.joinedOn)
-  );
+  const joinedDate = dashBoardDetails?.joinedOn
+    ? new Date(dashBoardDetails.joinedOn)
+    : null;
+
+  const monthsBeenMember = calculateDurationInMonths(joinedDate);
 
   const formatDate = (isoDate) => {
+    if (!isoDate) return "N/A";
+
     const date = new Date(isoDate);
+    if (isNaN(date)) return "N/A"; // Check if it's an Invalid Date
+
     return date.toLocaleString("en-US", {
       month: "long",
       year: "numeric",
@@ -201,8 +218,8 @@ const DashBoard = ({ navigation, route }) => {
     }
   }
 
-  function generateChartData(paymentInfos) {
-    return paymentInfos.map((paymentData, index) => {
+  function generateChartData(paymentInfos = []) {
+    return paymentInfos?.map((paymentData, index) => {
       const date = paymentData.paymentDate
         ? new Date(paymentData.paymentDate)
         : new Date();
@@ -243,8 +260,15 @@ const DashBoard = ({ navigation, route }) => {
 
   function accumulator(totalReturnsSoFar, currentPayment) {
     const invested = currentPayment.paymentAmount ?? 2200;
+    console.log(invested, totalReturnsSoFar, "checkTotalAmount");
     return totalReturnsSoFar + invested * 3;
   }
+
+  const totalPaid = paymentInfos
+    .filter((p) => p.isVerified)
+    .reduce((sum, p) => sum + p.paymentAmount, 0);
+
+  const expectedRefund = (totalPaid / 1200) * 3000;
 
   const generateQrCode = () => {
     setShowQrCode(true);
@@ -310,9 +334,7 @@ const DashBoard = ({ navigation, route }) => {
           >
             <View>
               <Text style={styles.withdrawBtnLabel}>Expected Funds</Text>
-              <Text style={styles.totalAmount}>
-                ₹{dashBoardDetails.returnsAmount}
-              </Text>
+              <Text style={styles.totalAmount}>₹{expectedRefund}</Text>
               <Text style={styles.readLabel}>Ready to withdraw</Text>
             </View>
             <Pressable onPress={handleWithdraw} style={styles.withdrawBtn}>
@@ -329,7 +351,7 @@ const DashBoard = ({ navigation, route }) => {
               <View style={styles.firstSubBox}>
                 <Text style={styles.numLabel}>{monthsBeenMember}</Text>
                 <Text style={styles.infoLabel}>
-                  Active since {formatDate(dashBoardDetails.joinedOn)}
+                  Active since {formatDate(dashBoardDetails?.joinedOn)}
                 </Text>
               </View>
             </View>
@@ -442,7 +464,7 @@ const DashBoard = ({ navigation, route }) => {
                     RECEIPT
                   </Text>
                 </View>
-                {chartData.map((item, indx) => (
+                {chartData?.map((item, indx) => (
                   <View
                     // onPress={() => verifyPayment(item.transactionId)}
                     style={styles.dataListContainer}
@@ -465,14 +487,14 @@ const DashBoard = ({ navigation, route }) => {
                         name="checkmark-circle"
                         size={24}
                         color={"#33A800"}
-                        style={{ width: "12%", marginLeft:10 }}
+                        style={{ width: "12%", marginLeft: 10 }}
                       />
                     ) : (
                       <Ionicons
                         name="close-circle"
                         size={24}
                         color={"#FF0000"}
-                        style={{ width: "12%" , marginLeft:10 }}
+                        style={{ width: "12%", marginLeft: 10 }}
                       />
                     )}
                     <Ionicons
@@ -530,7 +552,7 @@ const DashBoard = ({ navigation, route }) => {
                       <Text style={styles.tooltipTitle}>
                         {selectedBar.label}
                       </Text>
-                      {selectedBar.stacks.map((s, i) => (
+                      {selectedBar?.stacks?.map((s, i) => (
                         <Text key={i} style={{ color: s.color }}>
                           {s.label}: ₹{s.value}
                         </Text>
@@ -832,7 +854,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "gray",
   },
-  tableTextLabel:{
+  tableTextLabel: {
     fontWeight: "500",
     fontSize: 6,
     flexWrap: "wrap",

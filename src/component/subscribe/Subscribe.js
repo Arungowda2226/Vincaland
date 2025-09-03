@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const subscribPolicy = [
   { id: 1, title: "36 Months returns" },
-  { id: 2, title: "A maximum of 5000 investors will be accepted." },
+  { id: 2, title: "A maximum of 5000 premium members will be accepted." },
   { id: 3, title: "30% referral commission per loan" },
   { id: 4, title: "30% referral commission per person investment." },
   { id: 5, title: "30% referral commission per construction project." },
