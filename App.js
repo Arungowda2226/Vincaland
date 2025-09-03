@@ -20,6 +20,8 @@ import PaymentHistory from "./src/component/paymentModal/PaymentHistory";
 import CustomerService from "./src/component/customercare/CustomerService";
 import ReferForm from "./src/component/refer/ReferForm";
 import PaymentReceipt from "./src/component/paymentModal/PaymentReceipt";
+import * as Updates from "expo-updates";
+import { Alert, Platform } from "react-native";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -42,6 +44,34 @@ function MyDrawer() {
 }
 
 export default function App() {
+
+  // ✅ Auto-update logic
+    useEffect(() => {
+    const checkForUpdate = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          Alert.alert(
+            "Update available",
+            "The app will restart to apply the latest update.",
+            [
+              {
+                text: "OK",
+                onPress: () => Updates.reloadAsync(),
+              },
+            ]
+          );
+        }
+      } catch (e) {
+        console.log("Error checking for updates:", e);
+      }
+    };
+
+    if (Platform.OS !== "web") {
+      checkForUpdate();
+    }
+  }, []);
   return (
     <Provider store={store}>
       <NavigationContainer>

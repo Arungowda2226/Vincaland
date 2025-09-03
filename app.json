@@ -31,7 +31,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-   "runtimeVersion": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "plugins": [
       [
         "expo-build-properties",
@@ -55,6 +55,9 @@
       }
     },
     "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/4ae5d7ef-8f95-4567-b565-8ed1bacf6c4f"
     }
   }
